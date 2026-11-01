@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final deviceType = Responsive.getDeviceType(constraints.maxWidth);
 
         return Scaffold(
-        body: IndexedStack(index: _currentIndex, children: _screens),
+          body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: deviceType == DeviceType.mobile
               ? _buildScreenWithBottomNav()
               : SizedBox.shrink(),
@@ -55,18 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
     showUnselectedLabels: true,
 
     items: [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: 'Tổng quan',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.smart_toy),
-        label: 'Kế hoạch',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.bar_chart),
-        label: 'Báo cáo',
-      ),
+      BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Tổng quan'),
+      BottomNavigationBarItem(icon: Icon(Icons.smart_toy), label: 'Kế hoạch'),
+      BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Báo cáo'),
       BottomNavigationBarItem(
         icon: Icon(Icons.local_library),
         label: 'Cá nhân',

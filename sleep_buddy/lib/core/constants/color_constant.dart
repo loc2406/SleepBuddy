@@ -92,5 +92,6 @@ class ColorConstant {
 
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Colors.black;
+  static const Color yellow = Colors.yellow;
   static const Color transparent = Color(0x00000000);
 }

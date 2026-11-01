@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
-
+import 'package:sleep_buddy/features/overview/presentation/cubit/overview_cubit.dart';
+import 'package:sleep_buddy/features/overview/presentation/cubit/overview_state.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/moon_sphere.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/plan_button.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/stat_card.dart';
@@ -15,22 +16,73 @@ class OverviewScreen extends StatefulWidget {
 }
 
 class _OverviewScreenState extends State<OverviewScreen> {
+  late final OverviewCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = context.read<OverviewCubit>();
+    _cubit.loadTheme();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
+    return Scaffold(
+      appBar: AppBar(
+        leading: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                ColorConstant.gradientBackgroundStart,
+                ColorConstant.gradientBackgroundMiddle,
+                ColorConstant.gradientBackgroundEnd,
+              ],
+            ),
+          ),
+          child: Icon(Icons.nightlight_round, color: ColorConstant.black),
+        ),
+        title: Text(
+          'Sleep Buddy',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          BlocBuilder<OverviewCubit, OverviewState>(
+            builder: ((context, state) => Switch(
+              value: state.isNightMode,
+              onChanged: (value) async {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('isNightMode: $value')));
+                await _cubit.changeTheme(value);
+              },
+              thumbIcon: WidgetStateProperty.resolveWith<Icon?>((states) {
+                if (state.isNightMode) {
+                  return const Icon(
+                    Icons.nightlight_round,
+                    color: ColorConstant.white,
+                  );
+                }
+                return const Icon(Icons.wb_sunny, color: ColorConstant.yellow);
+              }),
+            )),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
 
-          final deviceType = Responsive.getDeviceType(width);
+            final deviceType = Responsive.getDeviceType(width);
 
-          final padding = Responsive.getScreenPadding(width);
+            final padding = Responsive.getScreenPadding(width);
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Center(
+            return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxWidth: Responsive.maxContentWidth,
@@ -41,7 +93,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   padding: padding,
 
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
                     border: Border.all(color: ColorConstant.borderPrimary),
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
@@ -68,16 +119,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
-
-  // ==========================================
-  // HERO SECTION
-  // ==========================================
 
   Widget _buildHeroSection(DeviceType deviceType) {
     final isMobile = deviceType == DeviceType.mobile;
@@ -89,13 +136,19 @@ class _OverviewScreenState extends State<OverviewScreen> {
     };
 
     final titleSize = switch (deviceType) {
-      DeviceType.mobile => 38.0,
+      DeviceType.mobile => 24.0,
       DeviceType.tablet => 48.0,
       DeviceType.desktop => 64.0,
     };
 
+    final subTitleSize = switch (deviceType) {
+      DeviceType.mobile => 16.0,
+      DeviceType.tablet => 32.0,
+      DeviceType.desktop => 48.0,
+    };
+
     final heroContent = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 26),
 
@@ -103,7 +156,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
           'Chào bạn, hôm nay thế nào?',
           style: TextStyle(
             fontSize: titleSize,
-            height: 1.12,
             fontWeight: FontWeight.bold,
             color: ColorConstant.textPrimary,
           ),
@@ -111,14 +163,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
         const SizedBox(height: 16),
 
-        const Text(
+        Text(
           'Chia nhỏ việc học, lắng nghe cơ thể '
           'và dành cho mình một giấc ngủ thật '
           'an lành. Mỗi bước nhỏ hôm nay đều '
           'đáng tự hào.',
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 16,
-            height: 2,
+            height: 1.5,
+            fontSize: subTitleSize,
             color: ColorConstant.textSecondary,
           ),
         ),
@@ -167,10 +220,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  // ==========================================
-  // STATISTICS SECTION
-  // ==========================================
-
   Widget _buildStatisticsSection(double width) {
     final columns = Responsive.getGridColumns(width);
 
@@ -207,7 +256,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
 class PlaceholderPage extends StatelessWidget {
   final String title;
 
-  const PlaceholderPage({required this.title});
+  const PlaceholderPage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
