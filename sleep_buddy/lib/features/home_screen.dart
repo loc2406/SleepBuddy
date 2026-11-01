@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_bottom_bar/liquid_glass_bottom_bar.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
@@ -33,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final deviceType = Responsive.getDeviceType(constraints.maxWidth);
 
         return Scaffold(
-          extendBody: true, // cho phép giao diện nằm sau glass
         body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: deviceType == DeviceType.mobile
               ? _buildScreenWithBottomNav()
@@ -43,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildScreenWithBottomNav() => LiquidGlassBottomBar(
+  Widget _buildScreenWithBottomNav() => BottomNavigationBar(
     currentIndex: _currentIndex,
 
     onTap: (index) {
@@ -52,28 +50,25 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     },
 
-    activeColor: ColorConstant.primary,
-      barBlurSigma: 10,
+    selectedItemColor: ColorConstant.primary,
+    unselectedItemColor: ColorConstant.black,
+    showUnselectedLabels: true,
 
     items: [
-      LiquidGlassBottomBarItem(
-        icon: Icons.home_outlined,
-        activeIcon: Icons.home_outlined,
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
         label: 'Tổng quan',
       ),
-      LiquidGlassBottomBarItem(
-        icon: Icons.task_alt_outlined,
-        activeIcon: Icons.task_alt_outlined,
-        label: 'Công việc',
+      BottomNavigationBarItem(
+        icon: Icon(Icons.smart_toy),
+        label: 'Kế hoạch',
       ),
-      LiquidGlassBottomBarItem(
-        icon: Icons.bedtime_outlined,
-        activeIcon: Icons.bedtime_outlined,
-        label: 'Giấc ngủ',
+      BottomNavigationBarItem(
+        icon: Icon(Icons.bar_chart),
+        label: 'Báo cáo',
       ),
-      LiquidGlassBottomBarItem(
-        icon: Icons.person_outline_rounded,
-        activeIcon: Icons.person_outline_rounded,
+      BottomNavigationBarItem(
+        icon: Icon(Icons.local_library),
         label: 'Cá nhân',
       ),
     ],

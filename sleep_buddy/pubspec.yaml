@@ -37,7 +37,6 @@ dependencies:
   flutter_bloc: ^9.1.1
   shared_preferences: ^2.5.5
   go_router: ^17.2.3
-  liquid_glass_bottom_bar: ^0.0.6
 
 dev_dependencies:
   flutter_test:
