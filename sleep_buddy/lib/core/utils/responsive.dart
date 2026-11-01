@@ -33,7 +33,7 @@ class Responsive {
       case DeviceType.tablet:
         return 2;
       case DeviceType.desktop:
-        return 3;
+        return 2;
     }
   }
 

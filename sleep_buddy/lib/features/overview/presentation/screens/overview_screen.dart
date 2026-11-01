@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sleep_buddy/core/constants/asset_constants.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
 import 'package:sleep_buddy/features/overview/presentation/cubit/overview_cubit.dart';
 import 'package:sleep_buddy/features/overview/presentation/cubit/overview_state.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/moon_sphere.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/plan_button.dart';
+import 'package:sleep_buddy/features/overview/presentation/widgets/daily_gold_card.dart';
+import 'package:sleep_buddy/features/overview/presentation/widgets/next_task_card.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/stat_card.dart';
+import 'package:sleep_buddy/features/overview/presentation/widgets/time_distribution_card.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -29,36 +31,33 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Container(
-          margin: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                ColorConstant.gradientBackgroundStart,
-                ColorConstant.gradientBackgroundMiddle,
-                ColorConstant.gradientBackgroundEnd,
-              ],
+        backgroundColor: ColorConstant.gradientBackgroundStart,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Xin chào, Thành Lộc!',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: ColorConstant.black,
+              ),
             ),
-          ),
-          child: Icon(Icons.nightlight_round, color: ColorConstant.black),
-        ),
-        title: Text(
-          'Sleep Buddy',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              'Học tập hiệu quả, nghỉ ngơi trọn vẹn nhé!',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: ColorConstant.black,
+              ),
+            ),
+          ],
         ),
         actions: [
           BlocBuilder<OverviewCubit, OverviewState>(
             builder: ((context, state) => Switch(
               value: state.isNightMode,
-              onChanged: (value) async {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('isNightMode: $value')));
-                await _cubit.changeTheme(value);
-              },
+              onChanged: (value) async => await _cubit.changeTheme(value),
               thumbIcon: WidgetStateProperty.resolveWith<Icon?>((states) {
                 if (state.isNightMode) {
                   return const Icon(
@@ -68,6 +67,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 }
                 return const Icon(Icons.wb_sunny, color: ColorConstant.yellow);
               }),
+              inactiveThumbColor: ColorConstant.white,
+              inactiveTrackColor: ColorConstant.primary,
             )),
           ),
         ],
@@ -77,8 +78,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
-
-            final deviceType = Responsive.getDeviceType(width);
 
             final padding = Responsive.getScreenPadding(width);
 
@@ -108,13 +107,76 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Hero section
-                      _buildHeroSection(deviceType),
-
-                      const SizedBox(height: 44),
-
-                      // Statistics section
-                      _buildStatisticsSection(width),
+                      Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          Image.asset(
+                            AssetConstants.catCloudBg,
+                            width: double.infinity,
+                          ),
+                          Positioned(
+                            top: 83,
+                            left: 20,
+                            child: Text(
+                              'Thứ 2, 02/11/2026',
+                              style: TextStyle(
+                                color: ColorConstant.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildHeaderCard(width),
+                      const SizedBox(height: 16),
+                      DailyGoalCard(
+                        completed: const Duration(
+                          hours: 3,
+                          minutes: 45,
+                        ), // Đã làm: 3h 45m
+                        goal: const Duration(hours: 5),
+                      ),
+                      const SizedBox(height: 16),
+                      NextTaskCard(
+                        title: 'Ôn tập Toán - Chương 3',
+                        startTime: const TimeOfDay(hour: 10, minute: 0),
+                        endTime: const TimeOfDay(hour: 11, minute: 30),
+                        priorityLabel: 'Cao',
+                        priorityColor: const Color(0xFFD81722), // Chữ đỏ đậm
+                        priorityBackground: const Color(
+                          0xFFFFE4E8,
+                        ), // Nền đỏ hồng nhạt
+                        onViewSchedule: () {},
+                      ),
+                      const SizedBox(height: 16),
+                      TimeDistributionCard(
+                        selectedPeriod: 'Hôm nay',
+                        periods: const ['Hôm nay', 'Hôm qua', 'Tuần này'],
+                        onPeriodChanged: (newPeriod) {},
+                        entries: const [
+                          TimeDistributionEntry(
+                            label: 'Học tập',
+                            duration: Duration(hours: 3, minutes: 40),
+                            color: Color(0xFF9377F6),
+                            gradientEnd: Color(0xFFA58BEF),
+                          ),
+                          TimeDistributionEntry(
+                            label: 'Nghỉ ngơi',
+                            duration: Duration(hours: 2, minutes: 30),
+                            color: Color(0xFF6BC88C),
+                            gradientEnd: Color(0xFFA1D7A1),
+                          ),
+                          TimeDistributionEntry(
+                            label: 'Khác',
+                            duration: Duration(hours: 1, minutes: 50),
+                            color: Color(0xFFFFB452),
+                            gradientEnd: Color(0xFFFFCF76),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -126,127 +188,34 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  Widget _buildHeroSection(DeviceType deviceType) {
-    final isMobile = deviceType == DeviceType.mobile;
-
-    final moonSize = switch (deviceType) {
-      DeviceType.mobile => 140.0,
-      DeviceType.tablet => 220.0,
-      DeviceType.desktop => 300.0,
-    };
-
-    final titleSize = switch (deviceType) {
-      DeviceType.mobile => 24.0,
-      DeviceType.tablet => 48.0,
-      DeviceType.desktop => 64.0,
-    };
-
-    final subTitleSize = switch (deviceType) {
-      DeviceType.mobile => 16.0,
-      DeviceType.tablet => 32.0,
-      DeviceType.desktop => 48.0,
-    };
-
-    final heroContent = Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 26),
-
-        Text(
-          'Chào bạn, hôm nay thế nào?',
-          style: TextStyle(
-            fontSize: titleSize,
-            fontWeight: FontWeight.bold,
-            color: ColorConstant.textPrimary,
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Text(
-          'Chia nhỏ việc học, lắng nghe cơ thể '
-          'và dành cho mình một giấc ngủ thật '
-          'an lành. Mỗi bước nhỏ hôm nay đều '
-          'đáng tự hào.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            height: 1.5,
-            fontSize: subTitleSize,
-            color: ColorConstant.textSecondary,
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        const PlanButton(),
-      ],
-    );
-
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: MoonSphere(size: moonSize),
-          ),
-
-          const SizedBox(height: 24),
-
-          heroContent,
-        ],
-      );
-    }
-
-    return SizedBox(
-      width: double.infinity,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 6, child: heroContent),
-
-          Expanded(
-            flex: 4,
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Transform.translate(
-                offset: Offset(0, deviceType == DeviceType.desktop ? -20 : 0),
-                child: MoonSphere(size: moonSize),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatisticsSection(double width) {
-    final columns = Responsive.getGridColumns(width);
-
+  Widget _buildHeaderCard(double width) {
     return GridView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columns,
+        crossAxisCount: 2,
         crossAxisSpacing: 20,
         mainAxisSpacing: 16,
-        mainAxisExtent: 150,
+        childAspectRatio: 1.8,
       ),
 
-      children: const [
+      children: [
         StatCard(
-          title: 'Nhiệm vụ hoàn thành',
-          subtitle: 'Mục tiêu học tập hôm nay',
-          value: '0 / 0',
-          valueColor: ColorConstant.textDark,
+          icTitle: Image.asset(AssetConstants.graduation, width: 24),
+          title: 'Học tập hôm nay',
+          subtitle: '+30 phút so với hôm qua',
+          value: '2h 30m',
+          valueTextColor: ColorConstant.textDark,
+          cardBgAsset: AssetConstants.cardStudyBg,
         ),
 
         StatCard(
-          title: 'Giấc ngủ gần nhất',
-          subtitle: 'Mục tiêu khuyến nghị: 8–10 giờ',
-          value: '—',
-          valueColor: ColorConstant.accentYellow,
+          icTitle: Image.asset(AssetConstants.bed, width: 24),
+          title: 'Nghỉ ngơi hôm nay',
+          subtitle: '+15 phút so với hôm qua',
+          value: '3h 0m',
+          valueTextColor: ColorConstant.textDark,
+          cardBgAsset: AssetConstants.cardRestBg,
         ),
       ],
     );
