@@ -4,8 +4,11 @@ import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
+import 'package:sleep_buddy/features/report/presentation/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
+import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
+import 'package:sleep_buddy/features/wellness/presentation/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -126,8 +129,55 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      PlaceholderPage(title: 'Giấc ngủ'),
-      PlaceholderPage(title: 'Cài đặt'),
+      SleepScreen(
+        data: SleepData(
+          periodLabel: 'Đêm qua · 02 – 03/11',
+          bedTime: DateTime(2026, 11, 2, 23, 0),
+          wakeTime: DateTime(2026, 11, 3, 6, 45),
+
+          // 7h45 / 8h ≈ 97%, còn thiếu 15 phút.
+          recordedDuration: const Duration(hours: 7, minutes: 45),
+          targetDuration: const Duration(hours: 8),
+
+          targetBedtime: const TimeOfDay(hour: 22, minute: 45),
+          reminderTime: const TimeOfDay(hour: 22, minute: 15),
+          reminderEnabled: true,
+          mood: SleepMood.normal,
+          recommendation: 'Bắt đầu nhẹ nhàng và nghỉ đều giữa các phiên.',
+        ),
+        guides: [
+          GuideArticle(
+            id: 'pomodoro',
+            category: GuideCategory.study,
+            title: 'Pomodoro: học tập theo từng phiên ngắn',
+            readTimeLabel: '4 phút đọc',
+            image: AssetImage('assets/wellness/book-glow.png'),
+          ),
+          GuideArticle(
+            id: 'eyes',
+            category: GuideCategory.relax,
+            title: '5 bài tập thư giãn mắt đơn giản',
+            readTimeLabel: '2 phút đọc',
+            image: AssetImage('assets/wellness/relaxation-thumb.png'),
+            coverImage: true,
+          ),
+          GuideArticle(
+            id: 'sleep',
+            category: GuideCategory.sleep,
+            title: 'Thói quen buổi tối để ngủ dễ dàng hơn',
+            readTimeLabel: '3 phút đọc',
+            image: AssetImage('assets/wellness/moon-card.png'),
+          ),
+          GuideArticle(
+            id: 'memory',
+            category: GuideCategory.study,
+            title: 'Ôn tập ngắt quãng: ghi nhớ lâu hơn',
+            readTimeLabel: '5 phút đọc',
+            image: AssetImage('assets/wellness/book.png'),
+          ),
+        ],
+      ),
+      AnalyticsScreen(),
       OverviewScreen(),
     ];
   }
