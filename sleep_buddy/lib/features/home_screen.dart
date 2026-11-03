@@ -1,6 +1,6 @@
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
-import 'package:sleep_buddy/core/utils/responsive.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 4;
   List<Widget> _screens = [];
   final DateTime selectedDate = DateTime(2026, 11, 3);
   late final List<DateTime> days;
@@ -93,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ];
     _screens = [
-      OverviewScreen(),
       StudyPlannerScreen(
         days: days,
         selectedDate: selectedDate,
@@ -103,8 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
         completedLessons: completedLessons,
         filters: filters,
       ),
+      PlaceholderPage(title: 'Đồng hồ'),
       PlaceholderPage(title: 'Giấc ngủ'),
-      PlaceholderPage(title: 'Cá nhân'),
+      PlaceholderPage(title: 'Cài đặt'),
+      OverviewScreen(),
     ];
   }
 
@@ -112,39 +113,53 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final deviceType = Responsive.getDeviceType(constraints.maxWidth);
-
         return Scaffold(
-          body: IndexedStack(index: _currentIndex, children: _screens),
-          bottomNavigationBar: deviceType == DeviceType.mobile
-              ? _buildScreenWithBottomNav()
-              : SizedBox.shrink(),
+          extendBody: true,
+          body: _screens[_currentIndex],
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => setState(() {
+              _currentIndex = 4;
+            }),
+            shape: const CircleBorder(side: BorderSide(color: ColorConstant.primary)),
+            backgroundColor:  ColorConstant.primary,
+            foregroundColor:_currentIndex == 4 ? ColorConstant.white : ColorConstant.black,
+            child: const Icon(Icons.home),
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: _buildScreenWithBottomNav(),
         );
       },
     );
   }
 
-  Widget _buildScreenWithBottomNav() => BottomNavigationBar(
-    currentIndex: _currentIndex,
-
-    onTap: (index) {
-      setState(() {
-        _currentIndex = index;
-      });
-    },
-
-    selectedItemColor: ColorConstant.primary,
-    unselectedItemColor: ColorConstant.black,
-    showUnselectedLabels: true,
-
-    items: [
-      BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Tổng quan'),
-      BottomNavigationBarItem(icon: Icon(Icons.smart_toy), label: 'Kế hoạch'),
-      BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Báo cáo'),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.local_library),
-        label: 'Cá nhân',
+  Widget _buildScreenWithBottomNav() {
+    List<IconData> iconList = [
+      Icons.checklist,
+      Icons.timer,
+      Icons.bed,
+      Icons.settings,
+    ];
+    return AnimatedBottomNavigationBar.builder(
+      activeIndex: _currentIndex,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      gapLocation: GapLocation.center,
+      notchSmoothness: NotchSmoothness.softEdge,
+      leftCornerRadius: 32,
+      rightCornerRadius: 32,
+      elevation: 0,
+      borderColor: Colors.transparent,
+      borderWidth: 0,
+      itemCount: iconList.length,
+      tabBuilder: (index, isActive) => Icon(
+        iconList[index],
+        size: 24,
+        color: isActive ? ColorConstant.primary : ColorConstant.black,
       ),
-    ],
-  );
+    );
+  }
 }

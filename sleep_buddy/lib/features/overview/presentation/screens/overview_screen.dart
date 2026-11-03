@@ -79,7 +79,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
           builder: (context, constraints) {
             final width = constraints.maxWidth;
 
-            final padding = Responsive.getScreenPadding(width);
+            final padding = Responsive.getScreenPadding(
+              width,
+              kBottomNavigationBarHeight + MediaQuery.paddingOf(context).bottom,
+            );
 
             return SingleChildScrollView(
               child: ConstrainedBox(
