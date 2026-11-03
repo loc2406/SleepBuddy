@@ -1,6 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
+import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
+import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
@@ -102,7 +104,28 @@ class _HomeScreenState extends State<HomeScreen> {
         completedLessons: completedLessons,
         filters: filters,
       ),
-      PlaceholderPage(title: 'Đồng hồ'),
+      FocusRestScreen(
+        timeText: '00:00',
+        timerLabel: 'Thời gian học tập',
+        timerProgress: 0.25,
+        isPlaying: false,
+        onPlayPause: () {},
+        studyDurationText: 'Phiên học',
+        restDurationText: 'Nghỉ ngơi',
+        progressTitle: 'Tiến trình hôm nay',
+        progressCountLabel: '2/4',
+        progressTimeDetail: '50 phút tập trung',
+        overallProgress: 0.5,
+        guides: [
+          RecoveryGuide(
+            id: 'eye_exercise',
+            tag: 'Giãn cơ',
+            title: '5 bài tập thư giãn mắt đơn giản',
+            readTime: '2 phút đọc',
+            thumbnail: AssetImage('assets/focus_rest/relaxation-thumb.png'),
+          ),
+        ],
+      ),
       PlaceholderPage(title: 'Giấc ngủ'),
       PlaceholderPage(title: 'Cài đặt'),
       OverviewScreen(),
@@ -120,9 +143,13 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => setState(() {
               _currentIndex = 4;
             }),
-            shape: const CircleBorder(side: BorderSide(color: ColorConstant.primary)),
-            backgroundColor:  ColorConstant.primary,
-            foregroundColor:_currentIndex == 4 ? ColorConstant.white : ColorConstant.black,
+            shape: const CircleBorder(
+              side: BorderSide(color: ColorConstant.primary),
+            ),
+            backgroundColor: ColorConstant.primary,
+            foregroundColor: _currentIndex == 4
+                ? ColorConstant.white
+                : ColorConstant.black,
             child: const Icon(Icons.home),
           ),
           floatingActionButtonLocation:
@@ -151,9 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
       notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 32,
       rightCornerRadius: 32,
-      elevation: 0,
-      borderColor: Colors.transparent,
-      borderWidth: 0,
+      elevation: 8,
+      borderColor: Color(0xFFF0EDF5),
+      shadow: const Shadow(color: Color(0x22000000), blurRadius: 12),
+      borderWidth: 1,
       itemCount: iconList.length,
       tabBuilder: (index, isActive) => Icon(
         iconList[index],

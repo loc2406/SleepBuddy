@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/utils/responsive.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/day_progress_card.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/lesson_card.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/lesson_filter_bar.dart';
@@ -67,6 +68,8 @@ class StudyPlannerScreen extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, viewport) {
             final gutter = viewport.maxWidth < 300 ? 12.0 : 16.0;
+            final width = viewport.maxWidth;
+
             return CustomScrollView(
               slivers: [
                 SliverPadding(
@@ -150,7 +153,13 @@ class StudyPlannerScreen extends StatelessWidget {
                     ),
                   ),
                 SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: gutter),
+                  padding: EdgeInsets.only(
+                    left: gutter,
+                    right: gutter,
+                    bottom:
+                        kBottomNavigationBarHeight +
+                        MediaQuery.paddingOf(context).bottom,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => Padding(

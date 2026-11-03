@@ -5,13 +5,16 @@ class SharedPref {
 
   // Theme
   static const String themeMode = 'theme_mode';
+  static const String keySoundEnabled = 'sound_enabled';
+  static const String keyFocusMinutes = 'focus_minutes';
+  static const String keyBreakMinutes = 'break_minutes';
 
   static Future<void> init() async {
     _instance = await SharedPreferences.getInstance();
   }
 
   static Future<bool> getBool(String key) async {
-     if (_instance == null) await init();
+    if (_instance == null) await init();
     return _instance?.getBool(key) ?? false;
   }
 
@@ -21,5 +24,13 @@ class SharedPref {
   }) async {
     if (_instance == null) await init();
     return await _instance?.setBool(key, value) ?? false;
+  }
+
+  static Future<void> setSoundEnabled(bool enabled) async {
+    await setBool(key: keySoundEnabled, value: enabled);
+  }
+
+  static Future<bool> isSoundEnabled() async {
+    return getBool(keySoundEnabled);
   }
 }
