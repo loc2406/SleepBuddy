@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/style.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class GuideCard extends StatelessWidget {
   const GuideCard({super.key, required this.article, this.onOpen});

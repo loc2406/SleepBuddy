@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 4;
+  int _currentIndex = 2;
   List<Widget> _screens = [];
   final DateTime selectedDate = DateTime(2026, 11, 3);
   late final List<DateTime> days;
@@ -129,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      OverviewScreen(),
       SleepScreen(
         data: SleepData(
           periodLabel: 'Đêm qua · 02 – 03/11',
@@ -178,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       AnalyticsScreen(),
-      OverviewScreen(),
     ];
   }
 
@@ -189,21 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           extendBody: true,
           body: _screens[_currentIndex],
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => setState(() {
-              _currentIndex = 4;
-            }),
-            shape: const CircleBorder(
-              side: BorderSide(color: ColorConstant.primary),
-            ),
-            backgroundColor: ColorConstant.primary,
-            foregroundColor: _currentIndex == 4
-                ? ColorConstant.white
-                : ColorConstant.black,
-            child: const Icon(Icons.home),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: _buildScreenWithBottomNav(),
         );
       },
@@ -214,6 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
     List<IconData> iconList = [
       Icons.checklist,
       Icons.timer,
+      Icons.home,
       Icons.bed,
       Icons.settings,
     ];
@@ -224,20 +210,31 @@ class _HomeScreenState extends State<HomeScreen> {
           _currentIndex = index;
         });
       },
-      gapLocation: GapLocation.center,
-      notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 32,
       rightCornerRadius: 32,
+      gapLocation: GapLocation.none,
       elevation: 8,
       borderColor: Color(0xFFF0EDF5),
       shadow: const Shadow(color: Color(0x22000000), blurRadius: 12),
       borderWidth: 1,
       itemCount: iconList.length,
-      tabBuilder: (index, isActive) => Icon(
-        iconList[index],
-        size: 24,
-        color: isActive ? ColorConstant.primary : ColorConstant.black,
-      ),
+      tabBuilder: (index, isActive) => index == 2
+          ? Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorConstant.primary,
+              ),
+              child: Icon(
+                iconList[index],
+                size: 24,
+                color: isActive ? ColorConstant.white : ColorConstant.black,
+              ),
+            )
+          : Icon(
+              iconList[index],
+              size: 24,
+              color: isActive ? ColorConstant.primary : ColorConstant.black,
+            ),
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:sleep_buddy/features/report/presentation/widgets/guide_card.dart
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/app_shell.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/choice_strip.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/style.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 /// Parent supplies the already-filtered article list. No fetching or search rules here.
 class LibraryScreen extends StatelessWidget {
@@ -92,6 +92,7 @@ class LibraryScreen extends StatelessWidget {
         title: 'Đọc một chút, áp dụng mỗi ngày',
         message: 'Bắt đầu với một thay đổi nhỏ trong lịch học.',
       ),
+      SizedBox(height: kBottomNavigationBarHeight),
     ],
   );
 }

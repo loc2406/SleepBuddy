@@ -7,7 +7,7 @@ import 'package:sleep_buddy/features/report/presentation/widgets/setting/duratio
 import 'package:sleep_buddy/features/report/presentation/widgets/setting/notification_card.dart';
 import 'package:sleep_buddy/features/report/presentation/widgets/setting/theme_mode_card.dart';
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/style.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({

@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'style.dart';
+import '../../../../core/config/app_style.dart';
 
 /// Measures labels including system text scaling, then scrolls if needed.
 class ChoiceStrip<T> extends StatelessWidget {

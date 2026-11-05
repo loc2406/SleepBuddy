@@ -3,7 +3,7 @@ import 'package:sleep_buddy/features/report/presentation/widgets/report_cards.da
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/app_shell.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/choice_strip.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/style.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class ReportScreen extends StatelessWidget {
   const ReportScreen({

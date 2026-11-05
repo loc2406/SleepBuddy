@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 
-import '../../../../wellness/presentation/widgets/style.dart';
+import '../../../../../core/config/app_style.dart';
 
 class SettingRow extends StatelessWidget {
   const SettingRow({

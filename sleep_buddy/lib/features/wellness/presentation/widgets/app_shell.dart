@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 
 import 'choice_strip.dart';
-import 'style.dart';
+import '../../../../core/config/app_style.dart';
 
 class WellnessShell extends StatelessWidget {
   const WellnessShell({

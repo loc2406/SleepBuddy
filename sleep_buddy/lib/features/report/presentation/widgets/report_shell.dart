@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/choice_strip.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/style.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class ReportShell extends StatelessWidget {
   const ReportShell({
