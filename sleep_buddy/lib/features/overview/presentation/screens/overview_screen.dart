@@ -24,7 +24,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   void initState() {
     super.initState();
     _cubit = context.read<OverviewCubit>();
-    _cubit.loadTheme();
   }
 
   @override
@@ -53,25 +52,25 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
           ],
         ),
-        actions: [
-          BlocBuilder<OverviewCubit, OverviewState>(
-            builder: ((context, state) => Switch(
-              value: state.isNightMode,
-              onChanged: (value) async => await _cubit.changeTheme(value),
-              thumbIcon: WidgetStateProperty.resolveWith<Icon?>((states) {
-                if (state.isNightMode) {
-                  return const Icon(
-                    Icons.nightlight_round,
-                    color: ColorConstant.white,
-                  );
-                }
-                return const Icon(Icons.wb_sunny, color: ColorConstant.yellow);
-              }),
-              inactiveThumbColor: ColorConstant.white,
-              inactiveTrackColor: ColorConstant.primary,
-            )),
-          ),
-        ],
+        // actions: [
+        //   BlocBuilder<OverviewCubit, OverviewState>(
+        //     builder: ((context, state) => Switch(
+        //       value: state.isNightMode,
+        //       onChanged: (value) async => await _cubit.changeTheme(value),
+        //       thumbIcon: WidgetStateProperty.resolveWith<Icon?>((states) {
+        //         if (state.isNightMode) {
+        //           return const Icon(
+        //             Icons.nightlight_round,
+        //             color: ColorConstant.white,
+        //           );
+        //         }
+        //         return const Icon(Icons.wb_sunny, color: ColorConstant.yellow);
+        //       }),
+        //       inactiveThumbColor: ColorConstant.white,
+        //       inactiveTrackColor: ColorConstant.primary,
+        //     )),
+        //   ),
+        // ],
       ),
       body: SafeArea(
         bottom: false,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/report/domain/model/guide_card.dart';
+import 'package:sleep_buddy/features/report/presentation/widgets/guide_card.dart';
 import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/app_shell.dart';
 import 'package:sleep_buddy/features/wellness/presentation/widgets/sleep_cards.dart';

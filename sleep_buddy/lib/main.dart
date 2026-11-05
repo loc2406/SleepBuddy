@@ -5,8 +5,12 @@ import 'package:sleep_buddy/core/theme/app_theme.dart';
 import 'package:sleep_buddy/core/utils/shared_pref.dart';
 import 'package:sleep_buddy/features/overview/presentation/cubit/overview_cubit.dart';
 import 'package:sleep_buddy/features/overview/presentation/cubit/overview_state.dart';
+import 'package:sleep_buddy/features/report/presentation/cubit/analytics_cubit.dart';
+import 'package:sleep_buddy/features/report/presentation/cubit/setting_state.dart';
+import 'package:sleep_buddy/features/report/presentation/cubit/settting_cubit.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await SharedPref.init();
   runApp(MyApp());
 }
@@ -17,14 +21,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => OverviewCubit())],
-      child: BlocBuilder<OverviewCubit, OverviewState>(
+      providers: [
+        BlocProvider(create: (_) => OverviewCubit()),
+        BlocProvider(create: (_) => AnalyticsCubit()),
+        BlocProvider(create: (_) => SettingCubit()),
+      ],
+      child: BlocBuilder<SettingCubit, SettingState>(
         builder: (context, state) => MaterialApp.router(
           routerConfig: appRouter,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          themeMode: state.isNightMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode: state.themeMode,
         ),
       ),
     );

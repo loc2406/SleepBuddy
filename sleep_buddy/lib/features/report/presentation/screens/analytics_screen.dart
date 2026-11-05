@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/utils/shared_pref.dart';
 import 'package:sleep_buddy/features/report/presentation/screens/library_screen.dart';
 import 'package:sleep_buddy/features/report/presentation/screens/report_screen.dart';
 import 'package:sleep_buddy/features/report/presentation/screens/settings_screen.dart';
@@ -126,19 +127,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
       case AnalyticsSection.settings:
         return SettingsScreen(
-          settings: WellnessSettings(
-            studyDuration: Duration(minutes: 25),
-            shortBreak: Duration(minutes: 5),
-            longBreak: Duration(minutes: 15),
-            notificationsEnabled: true,
-            soundEnabled: true,
-            themeMode: ThemeMode.light,
-          ),
+          // settings: WellnessSettings(
+          //   studyDuration: Duration(minutes: 25),
+          //   shortBreak: Duration(minutes: 5),
+          //   longBreak: Duration(minutes: 15),
+          //   notificationsEnabled: true,
+          //   soundEnabled: true,
+          //   themeMode: ThemeMode.light,
+          // ),
           onSectionChanged: changeSection,
           onOpenLibrary: () {
             changeSection(AnalyticsSection.library);
           },
-          saveStatusLabel: 'Bản xem thử · Chưa lưu thay đổi',
         );
     }
   }
