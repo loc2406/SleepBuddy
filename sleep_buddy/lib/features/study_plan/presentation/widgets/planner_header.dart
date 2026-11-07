@@ -31,11 +31,11 @@ class PlannerHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     height: 1.2,
                     fontWeight: FontWeight.w700,
-                    color: PlannerStyle.ink,
+                    color: PlannerStyle.ink(context),
                   ),
                 ),
                 Image.asset(
@@ -49,9 +49,9 @@ class PlannerHeader extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               dateLabel,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: PlannerStyle.secondary,
+                color: PlannerStyle.secondary(context),
               ),
             ),
           ],
@@ -61,11 +61,7 @@ class PlannerHeader extends StatelessWidget {
       IconButton(
         onPressed: onAddMissionPressed,
         tooltip: 'Thêm nhiệm vụ',
-        icon: Icon(
-                Icons.add,
-                color: ColorConstant.primary,
-                size: 29,
-              )
+        icon: Icon(Icons.add, color: ColorConstant.primary, size: 29),
       ),
     ],
   );

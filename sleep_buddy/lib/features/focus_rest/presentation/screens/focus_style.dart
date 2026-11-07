@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 abstract final class FocusStyle {
-  static const ink = Color(0xFF160D3E);
-  static const secondary = Color(0xFF6B6094);
-  static const muted = Color(0xFF8F84AD);
   static const purple = Color(0xFF7A52F4);
-  static const border = Color(0xFFECE7FA);
 
   static const background = LinearGradient(
     begin: Alignment.topCenter,
@@ -16,6 +13,13 @@ abstract final class FocusStyle {
   static const primaryGradient = LinearGradient(
     colors: [Color(0xFF8E6CF6), Color(0xFF7A52F4)],
   );
+  static LinearGradient pageGradient(BuildContext context) =>
+      AppStyle.pageGradient(context);
+  static Color ink(BuildContext context) => AppStyle.ink(context);
+  static Color secondary(BuildContext context) => AppStyle.muted(context);
+  static Color surface(BuildContext context) => AppStyle.surface(context);
+  static Color border(BuildContext context) => AppStyle.border(context);
+  static Color track(BuildContext context) => AppStyle.track(context);
 }
 
 class FocusSurface extends StatelessWidget {
@@ -36,18 +40,21 @@ class FocusSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          color: gradient == null ? background : null,
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(color: FocusStyle.border, width: 0.8),
-          boxShadow: const [
-            BoxShadow(
-                color: Color(0x065E3E9C), blurRadius: 14, offset: Offset(0, 5)),
-          ],
+    width: double.infinity,
+    padding: padding,
+    decoration: BoxDecoration(
+      color: gradient == null ? AppStyle.surface(context) : null,
+      gradient: gradient,
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(color: AppStyle.border(context), width: 0.8),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x065E3E9C),
+          blurRadius: 14,
+          offset: Offset(0, 5),
         ),
-        child: child,
-      );
+      ],
+    ),
+    child: child,
+  );
 }

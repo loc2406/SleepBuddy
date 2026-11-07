@@ -28,7 +28,7 @@ class FocusBackdrop extends CustomPainter {
     for (final point in [
       Offset(w * .16, y - 115),
       Offset(w * .88, y - 102),
-      Offset(w * .80, y - 165)
+      Offset(w * .80, y - 165),
     ]) {
       final star = Path()
         ..moveTo(point.dx, point.dy - 8)

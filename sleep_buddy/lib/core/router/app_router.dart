@@ -62,6 +62,7 @@ final appRouter = GoRouter(
               ),
             ],
           ),
+          article: guide,
           onBack: () => context.pop(),
         );
       },

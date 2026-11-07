@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class OverviewState {
   final bool isNightMode;
 

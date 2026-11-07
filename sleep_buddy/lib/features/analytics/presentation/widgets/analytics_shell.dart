@@ -23,8 +23,8 @@ class AnalyticsShell extends StatelessWidget {
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AppStyle.dark(c)
-        ? const Color(0xFF1C1729)
-        : const Color(0xFFEFEDFF),
+        ? const Color(0xFF221B30)
+        : const Color(0xFFFCFBFF),
     body: DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(

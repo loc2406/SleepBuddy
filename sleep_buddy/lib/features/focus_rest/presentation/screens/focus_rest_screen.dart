@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/widgets/circular_timer_dial.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/widgets/duration_selector.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/widgets/focus_backdrop.dart';
@@ -86,18 +87,15 @@ class FocusRestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFEFEDFF),
+    backgroundColor: AppStyle.pageBackground(context),
     body: DecoratedBox(
-      decoration: const BoxDecoration(gradient: FocusStyle.background),
+      decoration: BoxDecoration(gradient: FocusStyle.pageGradient(context)),
       child: SafeArea(
         bottom: !showNavigation,
         child: LayoutBuilder(
           builder: (context, viewport) {
             final width = viewport.maxWidth;
-            final padding = Responsive.getScreenPadding(
-              width,
-              kBottomNavigationBarHeight + MediaQuery.paddingOf(context).bottom,
-            );
+            final padding = Responsive.getScreenPadding(width);
             return CustomPaint(
               painter: const FocusBackdrop(),
               child: CustomScrollView(
@@ -163,20 +161,20 @@ class FocusRestScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   guideSectionTitle,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: FocusStyle.ink,
+                                    color: FocusStyle.ink(context),
                                   ),
                                 ),
                                 TextButton(
                                   key: const ValueKey('more-guides'),
                                   onPressed: onViewMoreGuides,
-                                  child: const Text(
+                                  child: Text(
                                     'Xem thêm  ›',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: FocusStyle.secondary,
+                                      color: FocusStyle.secondary(context),
                                     ),
                                   ),
                                 ),
@@ -188,7 +186,7 @@ class FocusRestScreen extends StatelessWidget {
                                 guide: guide,
                                 onTap: () => onGuideTap?.call(guide),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: kBottomNavigationBarHeight),
                             ],
                           ],
                         ),

@@ -1,13 +1,16 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/core/db/guide_article_dao.dart';
+import 'package:sleep_buddy/core/db/settings_dao.dart';
+import 'package:sleep_buddy/core/db/sleep_dao.dart';
+import 'package:sleep_buddy/core/db/study_task_dao.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
-import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,9 +23,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<Widget> _screens = [];
-  final DateTime selectedDate = DateTime(2026, 11, 3);
-  late final List<DateTime> days;
-  late final String dateLabel;
+  bool _isLoading = true;
+  late DateTime selectedDate;
+  late List<DateTime> days;
+  late String dateLabel;
   late final List<StudyLesson> lessons;
   late final int totalLessons;
   late final int completedLessons;
@@ -31,155 +35,82 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    days = List.generate(7, (index) => DateTime(2026, 11, 2 + index));
-    dateLabel = 'Thứ Ba, 3 tháng 11';
-    lessons = const [
-      StudyLesson(
-        id: 'lesson-1',
-        subject: 'Toán học',
-        title: 'Hàm số và đồ thị',
-        description: 'Ôn tập hàm bậc hai và cách vẽ đồ thị',
-        startTime: TimeOfDay(hour: 8, minute: 0),
-        endTime: TimeOfDay(hour: 9, minute: 30),
-        priority: LessonPriority.high,
-        status: LessonStatus.completed,
-      ),
-      StudyLesson(
-        id: 'lesson-2',
-        subject: 'Tiếng Anh',
-        title: 'Luyện nghe IELTS',
-        description: 'Luyện Section 3 và ghi chú từ khóa',
-        startTime: TimeOfDay(hour: 10, minute: 0),
-        endTime: TimeOfDay(hour: 11, minute: 0),
-        priority: LessonPriority.medium,
-        status: LessonStatus.inProgress,
-      ),
-      StudyLesson(
-        id: 'lesson-3',
-        subject: 'Vật lý',
-        title: 'Điện xoay chiều',
-        description: 'Làm bài tập về mạch RLC',
-        startTime: TimeOfDay(hour: 14, minute: 0),
-        endTime: TimeOfDay(hour: 15, minute: 30),
-        priority: LessonPriority.high,
-        status: LessonStatus.notStarted,
-      ),
-      StudyLesson(
-        id: 'lesson-4',
-        subject: 'Lịch sử',
-        title: 'Chiến tranh thế giới thứ hai',
-        description: 'Tóm tắt diễn biến và đọc tài liệu tham khảo',
-        startTime: TimeOfDay(hour: 16, minute: 0),
-        endTime: TimeOfDay(hour: 17, minute: 0),
-        priority: LessonPriority.low,
-        status: LessonStatus.completed,
-      ),
-    ];
+    _loadDatabaseData();
+  }
+
+  Future<void> _loadDatabaseData() async {
+    final now = DateTime.now();
+    selectedDate = DateTime(now.year, now.month, now.day);
+    final weekStart = selectedDate.subtract(
+      Duration(days: selectedDate.weekday - 1),
+    );
+    days = List.generate(7, (index) => weekStart.add(Duration(days: index)));
+    dateLabel =
+        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
+
+    lessons = await StudyTaskDao.getByDate(selectedDate);
     totalLessons = lessons.length;
     completedLessons = lessons
         .where((lesson) => lesson.status == LessonStatus.completed)
         .length;
-    filters = const [
-      PlannerFilterItem(value: LessonFilter.all, label: 'Tất cả', count: 4),
-      PlannerFilterItem(
-        value: LessonFilter.notStarted,
-        label: 'Chưa học',
-        count: 1,
-      ),
-      PlannerFilterItem(
-        value: LessonFilter.inProgress,
-        label: 'Đang học',
-        count: 1,
-      ),
-      PlannerFilterItem(
-        value: LessonFilter.completed,
-        label: 'Hoàn thành',
-        count: 2,
-      ),
-    ];
-    _screens = [
-      OverviewScreen(),
-      StudyPlannerScreen(
-        days: days,
-        selectedDate: selectedDate,
-        dateLabel: dateLabel,
-        lessons: lessons,
-        totalLessons: totalLessons,
-        completedLessons: completedLessons,
-        filters: filters,
-      ),
-      FocusRestScreen(
-        timeText: '00:00',
-        timerLabel: 'Thời gian học tập',
-        timerProgress: 0.25,
-        isPlaying: false,
-        onPlayPause: () {},
-        studyDurationText: 'Phiên học',
-        restDurationText: 'Nghỉ ngơi',
-        progressTitle: 'Tiến trình hôm nay',
-        progressCountLabel: '2/4',
-        progressTimeDetail: '50 phút tập trung',
-        overallProgress: 0.5,
-        guides: [
-          RecoveryGuide(
+    filters = await StudyTaskDao.getFilterItems(selectedDate);
+    final guides = await GuideArticleDao.getAll();
+    final sleepData = await SleepDao.getLatest();
+    final studyMinutes = await SettingsDao.getInt('study_duration_minutes', 30);
+    final shortBreakMinutes = await SettingsDao.getInt(
+      'short_break_minutes',
+      5,
+    );
+    final recoveryGuide = guides.isEmpty
+        ? const RecoveryGuide(
             id: 'eye_exercise',
             tag: 'Giãn cơ',
             title: '5 bài tập thư giãn mắt đơn giản',
             readTime: '2 phút đọc',
             thumbnail: AssetImage('assets/focus_rest/relaxation-thumb.png'),
-          ),
-        ],
-      ),
-      SleepScreen(
-        data: SleepData(
-          periodLabel: 'Đêm qua · 02 – 03/11',
-          bedTime: DateTime(2026, 11, 2, 23, 0),
-          wakeTime: DateTime(2026, 11, 3, 6, 45),
+          )
+        : RecoveryGuide(
+            id: guides.first.id,
+            tag: guides.first.category.name == 'relax' ? 'Giãn cơ' : 'Học tập',
+            title: guides.first.title,
+            readTime: guides.first.readTimeLabel,
+            thumbnail: guides.first.image,
+          );
 
-          // 7h45 / 8h ≈ 97%, còn thiếu 15 phút.
-          recordedDuration: const Duration(hours: 7, minutes: 45),
-          targetDuration: const Duration(hours: 8),
-
-          targetBedtime: const TimeOfDay(hour: 22, minute: 45),
-          reminderTime: const TimeOfDay(hour: 22, minute: 15),
-          reminderEnabled: true,
-          mood: SleepMood.normal,
-          recommendation: 'Bắt đầu nhẹ nhàng và nghỉ đều giữa các phiên.',
+    if (!mounted) return;
+    setState(() {
+      _screens = [
+        const OverviewScreen(),
+        StudyPlannerScreen(
+          days: days,
+          selectedDate: selectedDate,
+          dateLabel: dateLabel,
+          lessons: lessons,
+          totalLessons: totalLessons,
+          completedLessons: completedLessons,
+          filters: filters,
         ),
-        guides: [
-          GuideArticle(
-            id: 'pomodoro',
-            category: GuideCategory.study,
-            title: 'Pomodoro: học tập theo từng phiên ngắn',
-            readTimeLabel: '4 phút đọc',
-            image: AssetImage('assets/wellness/book-glow.png'),
-          ),
-          GuideArticle(
-            id: 'eyes',
-            category: GuideCategory.relax,
-            title: '5 bài tập thư giãn mắt đơn giản',
-            readTimeLabel: '2 phút đọc',
-            image: AssetImage('assets/wellness/relaxation-thumb.png'),
-            coverImage: true,
-          ),
-          GuideArticle(
-            id: 'sleep',
-            category: GuideCategory.sleep,
-            title: 'Thói quen buổi tối để ngủ dễ dàng hơn',
-            readTimeLabel: '3 phút đọc',
-            image: AssetImage('assets/wellness/moon-card.png'),
-          ),
-          GuideArticle(
-            id: 'memory',
-            category: GuideCategory.study,
-            title: 'Ôn tập ngắt quãng: ghi nhớ lâu hơn',
-            readTimeLabel: '5 phút đọc',
-            image: AssetImage('assets/wellness/book.png'),
-          ),
-        ],
-      ),
-      AnalyticsScreen(),
-    ];
+        FocusRestScreen(
+          timeText: '${studyMinutes.toString().padLeft(2, '0')}:00',
+          timerLabel: 'Thời gian học tập',
+          timerProgress: 0.25,
+          isPlaying: false,
+          onPlayPause: () {},
+          studyDurationText: '$studyMinutes phút',
+          restDurationText: '$shortBreakMinutes phút',
+          progressTitle: 'Tiến trình hôm nay',
+          progressCountLabel: '$completedLessons/$totalLessons',
+          progressTimeDetail: '$studyMinutes phút tập trung',
+          overallProgress: totalLessons == 0
+              ? 0
+              : completedLessons / totalLessons,
+          guides: [recoveryGuide],
+        ),
+        SleepScreen(data: sleepData, guides: guides),
+        const AnalyticsScreen(),
+      ];
+      _isLoading = false;
+    });
   }
 
   @override
@@ -187,9 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
+          backgroundColor: AppStyle.pageBackground(context),
           extendBody: true,
-          body: _screens[_currentIndex],
-          bottomNavigationBar: _buildScreenWithBottomNav(context),
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _screens[_currentIndex],
+          bottomNavigationBar: _isLoading
+              ? null
+              : _buildScreenWithBottomNav(context),
         );
       },
     );
@@ -226,11 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(32),
                 color: AppStyle.purple,
               ),
-              child: Icon(
-                iconList[index],
-                size: 24,
-                color: Colors.white,
-              ),
+              child: Icon(iconList[index], size: 24, color: Colors.white),
             )
           : Icon(
               iconList[index],

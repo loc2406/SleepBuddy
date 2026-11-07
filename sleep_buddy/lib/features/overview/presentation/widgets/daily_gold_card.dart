@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class DailyGoalCard extends StatelessWidget {
   const DailyGoalCard({
@@ -53,7 +54,7 @@ class DailyGoalCard extends StatelessWidget {
         children: [
           Text(
             remainingLabel,
-            style: TextStyle(fontSize: 23 * s, color: const Color(0xFF655B90)),
+            style: TextStyle(fontSize: 23 * s, color: AppStyle.muted(context)),
           ),
           SizedBox(height: 7 * s),
           Text(
@@ -61,7 +62,7 @@ class DailyGoalCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 28 * s,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF100B2B),
+              color: AppStyle.ink(context),
             ),
           ),
         ],
@@ -77,7 +78,7 @@ class DailyGoalCard extends StatelessWidget {
               fontSize: 46 * s,
               height: 1.1,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF090713),
+              color: AppStyle.ink(context),
             ),
           ),
           SizedBox(height: 12 * s),
@@ -88,7 +89,7 @@ class DailyGoalCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const ColoredBox(color: Color(0xFFEDE9F5)),
+                  ColoredBox(color: AppStyle.track(context)),
                   FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: progress,
@@ -115,9 +116,12 @@ class DailyGoalCard extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(31 * s, 26 * s, 35 * s, 30 * s),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFDFC),
+            color: AppStyle.surface(context),
             borderRadius: radius,
-            image: DecorationImage(image: background, fit: BoxFit.fill),
+            border: Border.all(color: AppStyle.border(context)),
+            image: AppStyle.dark(context)
+                ? null
+                : DecorationImage(image: background, fit: BoxFit.fill),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,7 +143,7 @@ class DailyGoalCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28 * s,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF60558A),
+                        color: AppStyle.muted(context),
                       ),
                     ),
                     SizedBox(height: 16 * s),
@@ -156,7 +160,7 @@ class DailyGoalCard extends StatelessWidget {
                             width: 2 * s,
                             height: 76 * s,
                             margin: EdgeInsets.symmetric(horizontal: 31 * s),
-                            color: const Color(0xFFC6BEDD),
+                            color: AppStyle.border(context),
                           ),
                           remainingWidget,
                         ],

@@ -21,10 +21,7 @@ class RecoveryGuide {
 
 @immutable
 class FocusNavItem {
-  const FocusNavItem({
-    required this.label,
-    required this.image,
-  });
+  const FocusNavItem({required this.label, required this.image});
 
   final String label;
   final ImageProvider image;
@@ -32,14 +29,23 @@ class FocusNavItem {
 
 const defaultNavigationItems = [
   FocusNavItem(
-      label: 'Trang chủ', image: AssetImage('assets/focus_rest/home-nav.png')),
+    label: 'Trang chủ',
+    image: AssetImage('assets/focus_rest/home-nav.png'),
+  ),
   FocusNavItem(
-      label: 'Lịch trình',
-      image: AssetImage('assets/focus_rest/calendar-nav.png')),
+    label: 'Lịch trình',
+    image: AssetImage('assets/focus_rest/calendar-nav.png'),
+  ),
   FocusNavItem(
-      label: 'Tập trung', image: AssetImage('assets/focus_rest/timer-nav.png')),
+    label: 'Tập trung',
+    image: AssetImage('assets/focus_rest/timer-nav.png'),
+  ),
   FocusNavItem(
-      label: 'Nghỉ ngơi', image: AssetImage('assets/focus_rest/moon-nav.png')),
+    label: 'Nghỉ ngơi',
+    image: AssetImage('assets/focus_rest/moon-nav.png'),
+  ),
   FocusNavItem(
-      label: 'Thống kê', image: AssetImage('assets/focus_rest/chart-nav.png')),
+    label: 'Thống kê',
+    image: AssetImage('assets/focus_rest/chart-nav.png'),
+  ),
 ];

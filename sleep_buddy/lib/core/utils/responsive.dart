@@ -37,10 +37,10 @@ class Responsive {
     }
   }
 
-  static EdgeInsets getScreenPadding(double width, double navigationPadding) {
+  static EdgeInsets getScreenPadding(double width) {
     switch (getDeviceType(width)) {
       case DeviceType.mobile:
-        return EdgeInsets.fromLTRB(20,20,20, navigationPadding);
+        return EdgeInsets.all(20);
       case DeviceType.tablet:
         return const EdgeInsets.all(32);
       case DeviceType.desktop:

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 @immutable
 class TimeDistributionEntry {
@@ -15,7 +16,8 @@ class TimeDistributionEntry {
   final Color color;
   final Color? gradientEnd;
 
-  double get minutes => duration.isNegative ? 0 : duration.inMilliseconds / 60000;
+  double get minutes =>
+      duration.isNegative ? 0 : duration.inMilliseconds / 60000;
 }
 
 class TimeDistributionCard extends StatelessWidget {
@@ -57,7 +59,9 @@ class TimeDistributionCard extends StatelessWidget {
     final result = exact.map((value) => value.floor()).toList();
     final order = List.generate(entries.length, (index) => index)
       ..sort((a, b) {
-        final comparison = (exact[b] - result[b]).compareTo(exact[a] - result[a]);
+        final comparison = (exact[b] - result[b]).compareTo(
+          exact[a] - result[a],
+        );
         return comparison == 0 ? a.compareTo(b) : comparison;
       });
     final missing = 100 - result.fold<int>(0, (sum, value) => sum + value);
@@ -72,8 +76,12 @@ class TimeDistributionCard extends StatelessWidget {
     builder: (context, constraints) {
       final width = constraints.hasBoundedWidth ? constraints.maxWidth : 397.0;
       final s = (width / 794).clamp(0.36, 1.0);
-      final stacked = width < 320 || MediaQuery.textScalerOf(context).scale(14) > 19;
-      final totalMinutes = entries.fold<double>(0, (sum, entry) => sum + entry.minutes);
+      final stacked =
+          width < 320 || MediaQuery.textScalerOf(context).scale(14) > 19;
+      final totalMinutes = entries.fold<double>(
+        0,
+        (sum, entry) => sum + entry.minutes,
+      );
       final total = Duration(milliseconds: (totalMinutes * 60000).round());
       final format = durationFormatter ?? _format;
       final percents = percentages(entries);
@@ -95,7 +103,7 @@ class TimeDistributionCard extends StatelessWidget {
                         PieChartSectionData(
                           value: 1,
                           radius: 44 * s,
-                          color: const Color(0xFFEDE9F5),
+                          color: AppStyle.track(context),
                           showTitle: false,
                         ),
                       ]
@@ -109,7 +117,10 @@ class TimeDistributionCard extends StatelessWidget {
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [entry.color, entry.gradientEnd ?? entry.color],
+                                colors: [
+                                  entry.color,
+                                  entry.gradientEnd ?? entry.color,
+                                ],
                               ),
                             ),
                       ],
@@ -130,7 +141,7 @@ class TimeDistributionCard extends StatelessWidget {
                         fontSize: 38 * s,
                         height: 1.1,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0D0822),
+                        color: AppStyle.ink(context),
                       ),
                     ),
                     SizedBox(height: 5 * s),
@@ -138,7 +149,7 @@ class TimeDistributionCard extends StatelessWidget {
                       totalLabel,
                       style: TextStyle(
                         fontSize: 23 * s,
-                        color: const Color(0xFF62548D),
+                        color: AppStyle.muted(context),
                       ),
                     ),
                   ],
@@ -163,7 +174,10 @@ class TimeDistributionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [entries[i].color, entries[i].gradientEnd ?? entries[i].color],
+                      colors: [
+                        entries[i].color,
+                        entries[i].gradientEnd ?? entries[i].color,
+                      ],
                     ),
                   ),
                 ),
@@ -171,7 +185,10 @@ class TimeDistributionCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     entries[i].label,
-                    style: TextStyle(fontSize: 26 * s, color: const Color(0xFF1A123E)),
+                    style: TextStyle(
+                      fontSize: 26 * s,
+                      color: AppStyle.ink(context),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12 * s),
@@ -180,13 +197,16 @@ class TimeDistributionCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 26 * s,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF130B32),
+                    color: AppStyle.ink(context),
                   ),
                 ),
                 SizedBox(width: 15 * s),
                 Text(
                   '(${format(entries[i].duration.isNegative ? Duration.zero : entries[i].duration)})',
-                  style: TextStyle(fontSize: 25 * s, color: const Color(0xFF685B93)),
+                  style: TextStyle(
+                    fontSize: 25 * s,
+                    color: AppStyle.muted(context),
+                  ),
                 ),
               ],
             ),
@@ -195,7 +215,7 @@ class TimeDistributionCard extends StatelessWidget {
       );
 
       final picker = Material(
-        color: const Color(0xFFF0EDFF),
+        color: AppStyle.tinted(context),
         borderRadius: BorderRadius.circular(40),
         child: PopupMenuButton<String>(
           initialValue: selectedPeriod,
@@ -215,14 +235,14 @@ class TimeDistributionCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24 * s,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF1A1044),
+                    color: AppStyle.ink(context),
                   ),
                 ),
                 SizedBox(width: 7 * s),
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   size: 29 * s,
-                  color: const Color(0xFF1A1044),
+                  color: AppStyle.ink(context),
                 ),
               ],
             ),
@@ -240,7 +260,7 @@ class TimeDistributionCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 30 * s,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF130B3D),
+                color: AppStyle.ink(context),
               ),
             ),
           ),
@@ -254,9 +274,12 @@ class TimeDistributionCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           padding: EdgeInsets.fromLTRB(35 * s, 24 * s, 25 * s, 24 * s),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFEFF),
+            color: AppStyle.surface(context),
             borderRadius: BorderRadius.circular(39 * s),
-            image: DecorationImage(image: background, fit: BoxFit.fill),
+            border: Border.all(color: AppStyle.border(context)),
+            image: AppStyle.dark(context)
+                ? null
+                : DecorationImage(image: background, fit: BoxFit.fill),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

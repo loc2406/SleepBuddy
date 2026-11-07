@@ -4,10 +4,7 @@ import 'package:sleep_buddy/core/constants/color_constant.dart';
 class MoonSphere extends StatelessWidget {
   final double size;
 
-  const MoonSphere({
-    super.key,
-    required this.size,
-  });
+  const MoonSphere({super.key, required this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +17,7 @@ class MoonSphere extends StatelessWidget {
           right: size * 0.38,
           child: Icon(
             Icons.auto_awesome,
-            color: ColorConstant.moonPurple.withOpacity(0.35),
+            color: ColorConstant.moonPurple.withValues(alpha: 0.35),
             size: 24,
           ),
         ),
@@ -30,7 +27,7 @@ class MoonSphere extends StatelessWidget {
           right: 10,
           child: Icon(
             Icons.auto_awesome,
-            color: ColorConstant.moonPurple.withOpacity(0.3),
+            color: ColorConstant.moonPurple.withValues(alpha: 0.3),
             size: 20,
           ),
         ),
@@ -51,23 +48,17 @@ class MoonSphere extends StatelessWidget {
                 ColorConstant.moonPurple,
                 ColorConstant.moonShadow,
               ],
-              stops: [
-                0.0,
-                0.18,
-                0.42,
-                0.72,
-                1.0,
-              ],
+              stops: [0.0, 0.18, 0.42, 0.72, 1.0],
             ),
             boxShadow: [
               BoxShadow(
-                color: ColorConstant.shadowPurple.withOpacity(0.35),
+                color: ColorConstant.shadowPurple.withValues(alpha: 0.35),
                 offset: const Offset(12, 22),
                 blurRadius: 18,
                 spreadRadius: -5,
               ),
               BoxShadow(
-                color: ColorConstant.moonPink.withOpacity(0.2),
+                color: ColorConstant.moonPink.withValues(alpha: 0.2),
                 offset: const Offset(-10, -10),
                 blurRadius: 30,
               ),

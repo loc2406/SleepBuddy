@@ -19,36 +19,68 @@ class GuideArticleDao {
         {
           'id': 'pomodoro',
           'category': 'study',
+          'tag': 'Học tập',
           'title': 'Pomodoro: học tập theo từng phiên ngắn',
+          'subtitle':
+              'Chia thời gian học thành các phiên ngắn để duy trì tập trung.',
           'read_time_label': '4 phút đọc',
           'image_path': 'assets/wellness/book-glow.png',
+          'hero_image_path': 'assets/wellness/book-glow.png',
+          'golden_rule_title': 'Quy tắc vàng',
+          'golden_rule_description':
+              'Học sâu trong 25 phút, nghỉ ngắn và lặp lại đều đặn.',
+          'applied_count': 128,
           'cover_image': 0,
           'display_order': 0,
         },
         {
           'id': 'eyes',
           'category': 'relax',
+          'tag': 'Giãn cơ',
           'title': '5 bài tập thư giãn mắt đơn giản',
+          'subtitle':
+              'Bảo vệ mắt khỏi mỏi khi học hoặc làm việc lâu trên màn hình.',
           'read_time_label': '2 phút đọc',
           'image_path': 'assets/wellness/relaxation-thumb.png',
+          'hero_image_path': 'assets/wellness/relaxation-thumb.png',
+          'golden_rule_title': 'Quy tắc vàng',
+          'golden_rule_description':
+              'Cứ 20 phút nhìn xa trong 20 giây để thư giãn cơ mắt.',
+          'applied_count': 256,
           'cover_image': 1,
           'display_order': 1,
         },
         {
           'id': 'sleep',
           'category': 'sleep',
+          'tag': 'Giấc ngủ',
           'title': 'Thói quen buổi tối để ngủ dễ dàng hơn',
+          'subtitle':
+              'Chuẩn bị cho cơ thể một chuỗi tín hiệu thư giãn trước giờ ngủ.',
           'read_time_label': '3 phút đọc',
           'image_path': 'assets/wellness/moon-card.png',
+          'hero_image_path': 'assets/wellness/moon-card.png',
+          'golden_rule_title': 'Quy tắc vàng',
+          'golden_rule_description':
+              'Điều chỉnh đèn, thiết bị và nhịp sinh học trước giờ ngủ.',
+          'applied_count': 184,
           'cover_image': 0,
           'display_order': 2,
         },
         {
           'id': 'memory',
           'category': 'study',
+          'tag': 'Học tập',
           'title': 'Ôn tập ngắt quãng: ghi nhớ lâu hơn',
+          'subtitle':
+              'Lên lịch ôn lại theo khoảng cách để củng cố trí nhớ dài hạn.',
           'read_time_label': '5 phút đọc',
           'image_path': 'assets/wellness/book.png',
+          'hero_image_path': 'assets/wellness/book.png',
+          'golden_rule_title': 'Quy tắc vàng',
+          'golden_rule_description':
+              'Ôn lại trước khi gần quên để tăng độ bền của ghi nhớ.',
+          'applied_count': 96,
           'cover_image': 0,
           'display_order': 3,
         },
@@ -66,10 +98,7 @@ class GuideArticleDao {
 
   static Future<List<GuideArticle>> getAll() async {
     final db = await AppDatabase.instance.database;
-    final rows = await db.query(
-      table,
-      orderBy: 'display_order ASC',
-    );
+    final rows = await db.query(table, orderBy: 'display_order ASC');
 
     return rows.map(_fromRow).toList();
   }

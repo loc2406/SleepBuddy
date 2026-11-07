@@ -1,7 +1,8 @@
-import 'package:flutter/src/material/app.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_buddy/core/utils/shared_pref.dart';
+import 'package:sleep_buddy/core/db/settings_dao.dart';
 import 'package:sleep_buddy/features/analytics/presentation/cubit/setting_state.dart';
 
 class SettingCubit extends Cubit<SettingState> {
@@ -10,10 +11,20 @@ class SettingCubit extends Cubit<SettingState> {
   }
 
   Future<void> getInitData() async {
-    final studyMinutes = await SharedPref.getStudyMinutes();
-    final shortBreakMinutes = await SharedPref.getShortBreakMinutes();
-    final longBreakMinutes = await SharedPref.getLongBreakMinutes();
-    final isFinishSoundEnabled = await SharedPref.isFinishSoundEnabled();
+    final studyMinutes = await SettingsDao.getInt('study_duration_minutes', 30);
+    final shortBreakMinutes = await SettingsDao.getInt(
+      'short_break_minutes',
+      5,
+    );
+    final longBreakMinutes = await SettingsDao.getInt('long_break_minutes', 15);
+    final isFinishSoundEnabled = await SettingsDao.getBool(
+      'finish_sound_enabled',
+      false,
+    );
+    final isNotificationEnabled = await SettingsDao.getBool(
+      'notifications_enabled',
+      false,
+    );
     final themeMode = await SharedPref.getThemeMode();
 
     emit(
@@ -21,7 +32,7 @@ class SettingCubit extends Cubit<SettingState> {
         studyMinutes: studyMinutes,
         shortBreakMinutes: shortBreakMinutes,
         longBreakMinutes: longBreakMinutes,
-        notificationEnabled: false,
+        notificationEnabled: isNotificationEnabled,
         finishSoundEnabled: isFinishSoundEnabled,
         themeMode: themeMode,
       ),
@@ -33,6 +44,7 @@ class SettingCubit extends Cubit<SettingState> {
 
     if (isEnabled) {
       emit(state.copyWith(notificationEnabled: false));
+      await SettingsDao.setBool('notifications_enabled', false);
       return;
     } else {
       var status = await Permission.notification.status;
@@ -43,23 +55,32 @@ class SettingCubit extends Cubit<SettingState> {
 
       if (status.isGranted) {
         emit(state.copyWith(notificationEnabled: true));
+        await SettingsDao.setBool('notifications_enabled', true);
         return;
       }
 
       if (status.isPermanentlyDenied) {
         emit(state.copyWith(notificationEnabled: false));
+        await SettingsDao.setBool('notifications_enabled', false);
         await openAppSettings();
         return;
       }
 
       emit(state.copyWith(notificationEnabled: false));
+      await SettingsDao.setBool('notifications_enabled', false);
     }
   }
 
   Future<void> syncNotificationPermission() async {
     final status = await Permission.notification.status;
-
     emit(state.copyWith(notificationEnabled: status.isGranted));
+    await SettingsDao.setBool('notifications_enabled', status.isGranted);
+  }
+
+  Future<void> changeFinishSound() async {
+    final enabled = !state.finishSoundEnabled;
+    await SettingsDao.setBool('finish_sound_enabled', enabled);
+    emit(state.copyWith(finishSoundEnabled: enabled));
   }
 
   Future<void> changeThemeMode(ThemeMode newMode) async {

@@ -71,7 +71,8 @@ class _SettingsScreenState extends State<SettingsScreen>
           soundEnabled: state.finishSoundEnabled,
           onNotificationsChanged: () async =>
               await context.read<SettingCubit>().changeNotification(),
-          // onSoundChanged: null,
+          onSoundChanged: () async =>
+              await context.read<SettingCubit>().changeFinishSound(),
         ),
       ),
       const SizedBox(height: 4),

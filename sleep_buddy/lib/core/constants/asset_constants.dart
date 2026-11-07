@@ -4,6 +4,9 @@ class AssetConstants {
   static const String target = 'assets/images/target.png';
   static const String bed = 'assets/images/bed.png';
   static const String catCloudBg = 'assets/images/cat_with_cloud_bg.png';
+  static const String catCloudBgDark = 'assets/images/cat_with_cloud_bg_dark.png';
   static const String cardStudyBg = 'assets/images/card_study_bg.png';
+  static const String cardStudyBgDark = 'assets/images/card_study_bg_dark.png';
   static const String cardRestBg = 'assets/images/card_rest_bg.png';
+  static const String cardRestBgDark = 'assets/images/card_rest_bg_dark.png';
 }

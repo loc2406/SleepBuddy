@@ -35,8 +35,11 @@ class StudyLesson {
 /// that load only one page of lessons at a time.
 @immutable
 class PlannerFilterItem {
-  const PlannerFilterItem(
-      {required this.value, required this.label, required this.count});
+  const PlannerFilterItem({
+    required this.value,
+    required this.label,
+    required this.count,
+  });
   final LessonFilter value;
   final String label;
   final int count;
@@ -51,14 +54,23 @@ class PlannerNavItem {
 
 const plannerNavigationItems = [
   PlannerNavItem(
-      label: 'Trang chủ', image: AssetImage('assets/planner/home-nav.png')),
+    label: 'Trang chủ',
+    image: AssetImage('assets/planner/home-nav.png'),
+  ),
   PlannerNavItem(
-      label: 'Lịch trình',
-      image: AssetImage('assets/planner/calendar-nav.png')),
+    label: 'Lịch trình',
+    image: AssetImage('assets/planner/calendar-nav.png'),
+  ),
   PlannerNavItem(
-      label: 'Tập trung', image: AssetImage('assets/planner/timer-nav.png')),
+    label: 'Tập trung',
+    image: AssetImage('assets/planner/timer-nav.png'),
+  ),
   PlannerNavItem(
-      label: 'Nghỉ ngơi', image: AssetImage('assets/planner/moon-nav.png')),
+    label: 'Nghỉ ngơi',
+    image: AssetImage('assets/planner/moon-nav.png'),
+  ),
   PlannerNavItem(
-      label: 'Thống kê', image: AssetImage('assets/planner/chart-nav.png')),
+    label: 'Thống kê',
+    image: AssetImage('assets/planner/chart-nav.png'),
+  ),
 ];

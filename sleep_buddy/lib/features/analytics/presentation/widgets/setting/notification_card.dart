@@ -8,11 +8,11 @@ class NotificationCard extends StatelessWidget {
     required this.notificationsEnabled,
     required this.soundEnabled,
     this.onNotificationsChanged,
-    // this.onSoundChanged,
+    this.onSoundChanged,
   });
   final bool notificationsEnabled, soundEnabled;
-  // final ValueChanged<bool>? onSoundChanged;
   final void Function()? onNotificationsChanged;
+  final void Function()? onSoundChanged;
   @override
   Widget build(BuildContext c) => WellnessCard(
     padding: EdgeInsetsGeometry.symmetric(vertical: 8, horizontal: 16),
@@ -26,15 +26,15 @@ class NotificationCard extends StatelessWidget {
           onSwitchChanged: onNotificationsChanged,
           actionKey: const ValueKey('notifications-switch'),
         ),
-        // Divider(height: 1, color: WellnessStyle.border(c)),
-        // SettingRow(
-        //   title: 'Chuông hết giờ',
-        //   subtitle: 'Phát âm thanh khi kết thúc phiên',
-        //   icon: Icons.timer,
-        //   switchValue: soundEnabled,
-        //   onSwitchChanged: null,
-        //   actionKey: const ValueKey('sound-switch'),
-        // ),
+        Divider(height: 1, color: AppStyle.border(c)),
+        SettingRow(
+          title: 'Chuông hết giờ',
+          subtitle: 'Phát âm thanh khi kết thúc phiên',
+          icon: Icons.timer,
+          switchValue: soundEnabled,
+          onSwitchChanged: onSoundChanged,
+          actionKey: const ValueKey('sound-switch'),
+        ),
       ],
     ),
   );

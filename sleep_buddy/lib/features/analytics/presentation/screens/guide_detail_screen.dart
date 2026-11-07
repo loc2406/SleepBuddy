@@ -1,15 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/core/db/guide_detail_dao.dart';
 import 'package:sleep_buddy/features/analytics/presentation/model/guide_detail_model.dart';
+import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
 
-class GuideDetailScreen extends StatelessWidget {
-  const GuideDetailScreen({super.key, required this.data, this.onBack});
+class GuideDetailScreen extends StatefulWidget {
+  const GuideDetailScreen({
+    super.key,
+    required this.data,
+    this.article,
+    this.onBack,
+  });
 
   final GuideDetailData data;
+  final GuideArticle? article;
   final VoidCallback? onBack;
 
   @override
+  State<GuideDetailScreen> createState() => _GuideDetailScreenState();
+}
+
+class _GuideDetailScreenState extends State<GuideDetailScreen> {
+  GuideDetailData? _databaseData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    if (widget.article == null) return;
+    final data = await GuideDetailDao.getByArticle(widget.article!);
+    if (!mounted || data == null) return;
+    setState(() => _databaseData = data);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final data = _databaseData ?? widget.data;
     return Scaffold(
       backgroundColor: AppStyle.dark(context)
           ? const Color(0xFF1C1729)
@@ -38,7 +67,7 @@ class GuideDetailScreen extends StatelessWidget {
                       context: context,
                       icon: Icons.chevron_left_rounded,
                       tooltip: 'Quay lại',
-                      onTap: onBack,
+                      onTap: widget.onBack,
                       key: const ValueKey('guide-back'),
                     ),
                     Expanded(

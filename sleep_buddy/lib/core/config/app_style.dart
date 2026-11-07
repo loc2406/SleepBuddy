@@ -12,6 +12,15 @@ abstract final class AppStyle {
       dark(c) ? const Color(0xFFC0B6D8) : const Color(0xFF6B6091);
   static Color surface(BuildContext c) =>
       dark(c) ? const Color(0xFF29233C) : const Color(0xFFFFFEFF);
+  static Color pageBackground(BuildContext c) =>
+      dark(c) ? const Color(0xFF221B30) : const Color(0xFFEFEDFF);
+  static LinearGradient pageGradient(BuildContext c) => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: dark(c)
+        ? const [Color(0xFF1C1729), Color(0xFF221B30)]
+        : const [Color(0xFFEFEDFF), Color(0xFFFCFBFF)],
+  );
   static Color track(BuildContext c) =>
       dark(c) ? const Color(0xFF49405E) : const Color(0xFFEDE9F5);
   static Color switchThumb(BuildContext c, {required bool active}) {
@@ -35,9 +44,9 @@ abstract final class AppStyle {
   static Color navUnselected(BuildContext c) =>
       dark(c) ? const Color(0xFFAEB4CD) : const Color(0xFF160D3E);
   static Shadow navShadow(BuildContext c) => Shadow(
-        color: dark(c) ? const Color(0x66000000) : const Color(0x22000000),
-        blurRadius: 12,
-      );
+    color: dark(c) ? const Color(0x66000000) : const Color(0x22000000),
+    blurRadius: 12,
+  );
 }
 
 class WellnessCard extends StatelessWidget {

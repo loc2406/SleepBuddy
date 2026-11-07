@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class NextTaskCard extends StatelessWidget {
   const NextTaskCard({
@@ -40,7 +41,8 @@ class NextTaskCard extends StatelessWidget {
     builder: (context, constraints) {
       final width = constraints.hasBoundedWidth ? constraints.maxWidth : 397.0;
       final s = (width / 794).clamp(0.36, 1.0);
-      final stacked = width < 320 || MediaQuery.textScalerOf(context).scale(14) > 19;
+      final stacked =
+          width < 320 || MediaQuery.textScalerOf(context).scale(14) > 19;
       final format = timeFormatter ?? _format;
 
       final button = DecoratedBox(
@@ -58,7 +60,10 @@ class NextTaskCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(40),
             onTap: onViewSchedule,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24 * s, vertical: 12 * s),
+              padding: EdgeInsets.symmetric(
+                horizontal: 24 * s,
+                vertical: 12 * s,
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -86,7 +91,12 @@ class NextTaskCard extends StatelessWidget {
       final task = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image(image: icon, width: 83 * s, height: 88 * s, fit: BoxFit.contain),
+          Image(
+            image: icon,
+            width: 83 * s,
+            height: 88 * s,
+            fit: BoxFit.contain,
+          ),
           SizedBox(width: 23 * s),
           Expanded(
             child: Column(
@@ -99,7 +109,7 @@ class NextTaskCard extends StatelessWidget {
                     fontSize: 31 * s,
                     height: 1.2,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF130B36),
+                    color: AppStyle.ink(context),
                   ),
                 ),
                 SizedBox(height: 10 * s),
@@ -114,14 +124,14 @@ class NextTaskCard extends StatelessWidget {
                         Icon(
                           Icons.access_time_rounded,
                           size: 25 * s,
-                          color: const Color(0xFF8071AC),
+                          color: AppStyle.muted(context),
                         ),
                         SizedBox(width: 8 * s),
                         Text(
                           '${format(startTime)} – ${format(endTime)}',
                           style: TextStyle(
                             fontSize: 25 * s,
-                            color: const Color(0xFF655A90),
+                            color: AppStyle.muted(context),
                           ),
                         ),
                       ],
@@ -130,19 +140,21 @@ class NextTaskCard extends StatelessWidget {
                       '•',
                       style: TextStyle(
                         fontSize: 23 * s,
-                        color: const Color(0xFF8274A9),
+                        color: AppStyle.muted(context),
                       ),
                     ),
                     Text(
                       priorityPrefix,
                       style: TextStyle(
                         fontSize: 24 * s,
-                        color: const Color(0xFF655A90),
+                        color: AppStyle.muted(context),
                       ),
                     ),
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        color: priorityBackground,
+                        color: AppStyle.dark(context)
+                            ? const Color(0xFF503B5F)
+                            : priorityBackground,
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Padding(
@@ -155,7 +167,9 @@ class NextTaskCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 23 * s,
                             height: 1.15,
-                            color: priorityColor,
+                            color: AppStyle.dark(context)
+                                ? const Color(0xFFFFB3BA)
+                                : priorityColor,
                           ),
                         ),
                       ),
@@ -175,9 +189,7 @@ class NextTaskCard extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              gradient: const LinearGradient(
-                colors: [Color(0xFFE6DFFF), Color(0xFFDDD4FF)],
-              ),
+              color: AppStyle.tinted(context),
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(
@@ -190,7 +202,9 @@ class NextTaskCard extends StatelessWidget {
                   fontSize: 25 * s,
                   height: 1.15,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF4020B0),
+                  color: AppStyle.dark(context)
+                      ? const Color(0xFFD0C1FF)
+                      : const Color(0xFF4020B0),
                 ),
               ),
             ),
@@ -208,8 +222,11 @@ class NextTaskCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(39 * s),
-            color: const Color(0xFFFEFDFF),
-            image: DecorationImage(image: background, fit: BoxFit.fill),
+            color: AppStyle.surface(context),
+            border: Border.all(color: AppStyle.border(context)),
+            image: AppStyle.dark(context)
+                ? null
+                : DecorationImage(image: background, fit: BoxFit.fill),
           ),
           child: stacked
               ? Column(

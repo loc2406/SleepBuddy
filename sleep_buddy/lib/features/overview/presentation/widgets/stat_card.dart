@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/constants/radius_constants.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 
 class StatCard extends StatelessWidget {
   final Image? icTitle;
@@ -8,7 +8,7 @@ class StatCard extends StatelessWidget {
   final String subtitle;
   final String? value;
   final Color? valueTextColor;
-  final String? cardBgAsset;
+  final String cardBgAsset;
 
   const StatCard({
     super.key,
@@ -17,7 +17,7 @@ class StatCard extends StatelessWidget {
     required this.subtitle,
     required this.value,
     required this.valueTextColor,
-    this.cardBgAsset,
+    required this.cardBgAsset,
   });
 
   @override
@@ -25,16 +25,13 @@ class StatCard extends StatelessWidget {
     width: double.infinity,
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: ColorConstant.backgroundCard.withValues(alpha: 0.88),
       borderRadius: RadiusConstants.mediumCircular,
-      border: Border.all(color: ColorConstant.border),
-      image: cardBgAsset != null
-          ? DecorationImage(
-              image: AssetImage(cardBgAsset!),
+      border: Border.all(color: AppStyle.border(context)),
+      image: DecorationImage(
+              image: AssetImage(cardBgAsset),
               fit: BoxFit.cover,
               alignment: Alignment.center,
-            )
-          : null,
+            ),
     ),
     child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -45,10 +42,10 @@ class StatCard extends StatelessWidget {
                 children: [
                   icTitle!,
                   const SizedBox(width: 8),
-                  Expanded(child: _buildTitle()),
+                  Expanded(child: _buildTitle(context)),
                 ],
               )
-            : _buildTitle(),
+            : _buildTitle(context),
 
         const SizedBox(height: 6),
 
@@ -56,10 +53,7 @@ class StatCard extends StatelessWidget {
           subtitle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 12,
-            color: ColorConstant.textTertiary,
-          ),
+          style: TextStyle(fontSize: 12, color: AppStyle.muted(context)),
         ),
         const SizedBox(height: 10),
         if (value != null)
@@ -70,20 +64,22 @@ class StatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.w800,
-              color: valueTextColor ?? ColorConstant.black,
+              color: AppStyle.dark(context)
+                  ? AppStyle.ink(context)
+                  : valueTextColor ?? AppStyle.ink(context),
             ),
           ),
       ],
     ),
   );
 
-  Widget _buildTitle() => Text(
+  Widget _buildTitle(BuildContext context) => Text(
     title,
     maxLines: 1,
     overflow: TextOverflow.ellipsis,
-    style: const TextStyle(
+    style: TextStyle(
       fontSize: 14,
-      color: ColorConstant.black,
+      color: AppStyle.ink(context),
       fontWeight: FontWeight.bold,
     ),
   );

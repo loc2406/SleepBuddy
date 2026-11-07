@@ -17,7 +17,7 @@ class PlanButton extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: ColorConstant.primary.withOpacity(0.25),
+            color: ColorConstant.primary.withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -31,10 +31,7 @@ class PlanButton extends StatelessWidget {
             // TODO: Navigate to planning screen
           },
           child: const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 18,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             child: Text(
               'Lên kế hoạch hôm nay →',
               style: TextStyle(

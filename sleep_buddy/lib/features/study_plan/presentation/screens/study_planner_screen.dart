@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/core/utils/responsive.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/day_progress_card.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/lesson_card.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/widgets/lesson_filter_bar.dart';
@@ -61,14 +61,13 @@ class StudyPlannerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFEFEDFF),
+    backgroundColor: AppStyle.pageBackground(context),
     body: DecoratedBox(
-      decoration: const BoxDecoration(gradient: PlannerStyle.background),
+      decoration: BoxDecoration(gradient: PlannerStyle.pageGradient(context)),
       child: SafeArea(
         child: LayoutBuilder(
           builder: (context, viewport) {
             final gutter = viewport.maxWidth < 300 ? 12.0 : 16.0;
-            final width = viewport.maxWidth;
 
             return CustomScrollView(
               slivers: [
@@ -103,11 +102,11 @@ class StudyPlannerScreen extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   listTitle,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     height: 1.3,
-                                    color: PlannerStyle.ink,
+                                    color: PlannerStyle.ink(context),
                                   ),
                                 ),
                               ),
@@ -116,9 +115,9 @@ class StudyPlannerScreen extends StatelessWidget {
                                 child: Text(
                                   '$totalLessons bài học',
                                   textAlign: TextAlign.right,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: PlannerStyle.secondary,
+                                    color: PlannerStyle.secondary(context),
                                   ),
                                 ),
                               ),
@@ -143,9 +142,9 @@ class StudyPlannerScreen extends StatelessWidget {
                         PlannerSurface(
                           child: Text(
                             emptyMessage,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: PlannerStyle.secondary,
+                              color: PlannerStyle.secondary(context),
                             ),
                           ),
                         ),
