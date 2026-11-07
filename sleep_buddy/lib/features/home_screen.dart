@@ -1,13 +1,13 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/core/constants/color_constant.dart';
+import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
 import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
-import 'package:sleep_buddy/features/report/presentation/screens/analytics_screen.dart';
+import 'package:sleep_buddy/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
-import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
+import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
 import 'package:sleep_buddy/features/wellness/presentation/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 2;
+  int _currentIndex = 0;
   List<Widget> _screens = [];
   final DateTime selectedDate = DateTime(2026, 11, 3);
   late final List<DateTime> days;
@@ -98,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ];
     _screens = [
+      OverviewScreen(),
       StudyPlannerScreen(
         days: days,
         selectedDate: selectedDate,
@@ -129,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      OverviewScreen(),
       SleepScreen(
         data: SleepData(
           periodLabel: 'Đêm qua · 02 – 03/11',
@@ -189,17 +189,17 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           extendBody: true,
           body: _screens[_currentIndex],
-          bottomNavigationBar: _buildScreenWithBottomNav(),
+          bottomNavigationBar: _buildScreenWithBottomNav(context),
         );
       },
     );
   }
 
-  Widget _buildScreenWithBottomNav() {
+  Widget _buildScreenWithBottomNav(BuildContext context) {
     List<IconData> iconList = [
+      Icons.home,
       Icons.checklist,
       Icons.timer,
-      Icons.home,
       Icons.bed,
       Icons.settings,
     ];
@@ -214,26 +214,28 @@ class _HomeScreenState extends State<HomeScreen> {
       rightCornerRadius: 32,
       gapLocation: GapLocation.none,
       elevation: 8,
-      borderColor: Color(0xFFF0EDF5),
-      shadow: const Shadow(color: Color(0x22000000), blurRadius: 12),
+      backgroundColor: AppStyle.navBackground(context),
+      borderColor: AppStyle.navBorder(context),
+      shadow: AppStyle.navShadow(context),
       borderWidth: 1,
       itemCount: iconList.length,
-      tabBuilder: (index, isActive) => index == 2
+      tabBuilder: (index, isActive) => isActive
           ? Container(
+              margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: ColorConstant.primary,
+                borderRadius: BorderRadius.circular(32),
+                color: AppStyle.purple,
               ),
               child: Icon(
                 iconList[index],
                 size: 24,
-                color: isActive ? ColorConstant.white : ColorConstant.black,
+                color: Colors.white,
               ),
             )
           : Icon(
               iconList[index],
               size: 24,
-              color: isActive ? ColorConstant.primary : ColorConstant.black,
+              color: AppStyle.navUnselected(context),
             ),
     );
   }

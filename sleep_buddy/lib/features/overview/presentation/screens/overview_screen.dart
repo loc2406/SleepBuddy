@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sleep_buddy/core/constants/asset_constants.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
-import 'package:sleep_buddy/features/overview/presentation/cubit/overview_cubit.dart';
-import 'package:sleep_buddy/features/overview/presentation/cubit/overview_state.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/daily_gold_card.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/next_task_card.dart';
 import 'package:sleep_buddy/features/overview/presentation/widgets/stat_card.dart';
@@ -18,14 +15,6 @@ class OverviewScreen extends StatefulWidget {
 }
 
 class _OverviewScreenState extends State<OverviewScreen> {
-  late final OverviewCubit _cubit;
-
-  @override
-  void initState() {
-    super.initState();
-    _cubit = context.read<OverviewCubit>();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,25 +41,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
           ],
         ),
-        // actions: [
-        //   BlocBuilder<OverviewCubit, OverviewState>(
-        //     builder: ((context, state) => Switch(
-        //       value: state.isNightMode,
-        //       onChanged: (value) async => await _cubit.changeTheme(value),
-        //       thumbIcon: WidgetStateProperty.resolveWith<Icon?>((states) {
-        //         if (state.isNightMode) {
-        //           return const Icon(
-        //             Icons.nightlight_round,
-        //             color: ColorConstant.white,
-        //           );
-        //         }
-        //         return const Icon(Icons.wb_sunny, color: ColorConstant.yellow);
-        //       }),
-        //       inactiveThumbColor: ColorConstant.white,
-        //       inactiveTrackColor: ColorConstant.primary,
-        //     )),
-        //   ),
-        // ],
       ),
       body: SafeArea(
         bottom: false,
@@ -109,26 +79,26 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Stack(
-                        alignment: Alignment.centerLeft,
-                        children: [
-                          Image.asset(
-                            AssetConstants.catCloudBg,
-                            width: double.infinity,
-                          ),
-                          Positioned(
-                            top: 83,
-                            left: 20,
-                            child: Text(
-                              'Thứ 2, 02/11/2026',
-                              style: TextStyle(
-                                color: ColorConstant.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                      AspectRatio(
+                        aspectRatio: 794 / 230,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(AssetConstants.catCloudBg),
+                              fit: BoxFit.fill,
                             ),
                           ),
-                        ],
+                          child: const Text(
+                            '\n\nThứ 2, 02/11/2026',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: ColorConstant.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       _buildHeaderCard(width),
@@ -191,58 +161,30 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Widget _buildHeaderCard(double width) {
-    return GridView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.8,
-      ),
-
-      children: [
-        StatCard(
-          icTitle: Image.asset(AssetConstants.graduation, width: 24),
-          title: 'Học tập hôm nay',
-          subtitle: '+30 phút so với hôm qua',
-          value: '2h 30m',
-          valueTextColor: ColorConstant.textDark,
-          cardBgAsset: AssetConstants.cardStudyBg,
-        ),
-
-        StatCard(
-          icTitle: Image.asset(AssetConstants.bed, width: 24),
-          title: 'Nghỉ ngơi hôm nay',
-          subtitle: '+15 phút so với hôm qua',
-          value: '3h 0m',
-          valueTextColor: ColorConstant.textDark,
-          cardBgAsset: AssetConstants.cardRestBg,
-        ),
-      ],
+    final isMobile = width < Responsive.mobileBreakpoint;
+    final studyCard = StatCard(
+      icTitle: Image.asset(AssetConstants.graduation, width: 24),
+      title: 'Học tập hôm nay',
+      subtitle: '+30 phút so với hôm qua',
+      value: '2h 30m',
+      valueTextColor: ColorConstant.textDark,
+      cardBgAsset: AssetConstants.cardStudyBg,
     );
-  }
-}
+    final restCard = StatCard(
+      icTitle: Image.asset(AssetConstants.bed, width: 24),
+      title: 'Nghỉ ngơi hôm nay',
+      subtitle: '+15 phút so với hôm qua',
+      value: '3h 0m',
+      valueTextColor: ColorConstant.textDark,
+      cardBgAsset: AssetConstants.cardRestBg,
+    );
 
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-
-  const PlaceholderPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConstant.background,
-      body: Center(
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: ColorConstant.textPrimary,
-          ),
-        ),
-      ),
+    return Row(
+      children: [
+        Expanded(child: studyCard),
+        const SizedBox(width: 20),
+        Expanded(child: restCard),
+      ],
     );
   }
 }

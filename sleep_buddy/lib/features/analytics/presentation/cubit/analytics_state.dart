@@ -1,4 +1,4 @@
-import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
+import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
 
 class AnalyticsState {
   final AnalyticsSection selectedTab;

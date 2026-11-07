@@ -28,6 +28,16 @@ abstract final class AppStyle {
       dark(c) ? const Color(0xFF463B61) : const Color(0xFFECE7FA);
   static Color tinted(BuildContext c) =>
       dark(c) ? const Color(0xFF3C3057) : const Color(0xFFF1EDFF);
+  static Color navBackground(BuildContext c) =>
+      dark(c) ? const Color(0xFF171A32) : const Color(0xFFFFFFFF);
+  static Color navBorder(BuildContext c) =>
+      dark(c) ? const Color(0xFF343957) : const Color(0xFFF0EDF5);
+  static Color navUnselected(BuildContext c) =>
+      dark(c) ? const Color(0xFFAEB4CD) : const Color(0xFF160D3E);
+  static Shadow navShadow(BuildContext c) => Shadow(
+        color: dark(c) ? const Color(0x66000000) : const Color(0x22000000),
+        blurRadius: 12,
+      );
 }
 
 class WellnessCard extends StatelessWidget {

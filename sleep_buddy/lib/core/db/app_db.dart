@@ -9,7 +9,7 @@ class AppDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('study_wellness.db');
+    _database = await _initDB('sleep_buddy.db');
     return _database!;
   }
 
@@ -80,24 +80,41 @@ class AppDatabase {
       )
     ''');
 
-    // 5. Bảng Cẩm nang (Guides & Bite-sized cards)
-    await db.execute('''
-      CREATE TABLE guides (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    // // 5. Bảng Cẩm nang (Guides & Bite-sized cards)
+    // await db.execute('''
+    //   CREATE TABLE guides (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     title TEXT NOT NULL,
+    //     summary TEXT NOT NULL,
+    //     content TEXT NOT NULL,
+    //     guide_type TEXT DEFAULT 'bite_sized',
+    //     tags TEXT
+    //   )
+    // ''');
+
+    // // Chèn dữ liệu mẫu cho cẩm nang lúc nghỉ ngơi
+    // await db.execute('''
+    //   INSERT INTO guides (title, summary, content, guide_type, tags) VALUES
+    //   ('Quy tắc 20-20-20', 'Mỗi 20 phút nhìn xa 20 feet (6m) trong 20 giây.', 'Giúp thư giãn các cơ mắt sau khi nhìn màn hình liên tục.', 'bite_sized', 'eye,rest'),
+    //   ('Kỹ thuật hạ nhiệt cơ thể', 'Tắm nước ấm trước khi ngủ 90 phút.', 'Khi rời khỏi phòng tắm, cơ thể hạ nhiệt độ dần giúp kích thích buồn ngủ tự nhiên.', 'bite_sized', 'sleep')
+    // ''');
+
+     await db.execute('''
+      CREATE TABLE guide_articles (
+        id TEXT PRIMARY KEY,
+        category TEXT NOT NULL,
         title TEXT NOT NULL,
-        summary TEXT NOT NULL,
-        content TEXT NOT NULL,
-        guide_type TEXT DEFAULT 'bite_sized',
-        tags TEXT
+        read_time_label TEXT NOT NULL,
+        image_path TEXT NOT NULL,
+        cover_image INTEGER NOT NULL DEFAULT 0,
+        display_order INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
-    // Chèn dữ liệu mẫu cho cẩm nang lúc nghỉ ngơi
-    await db.execute('''
-      INSERT INTO guides (title, summary, content, guide_type, tags) VALUES
-      ('Quy tắc 20-20-20', 'Mỗi 20 phút nhìn xa 20 feet (6m) trong 20 giây.', 'Giúp thư giãn các cơ mắt sau khi nhìn màn hình liên tục.', 'bite_sized', 'eye,rest'),
-      ('Kỹ thuật hạ nhiệt cơ thể', 'Tắm nước ấm trước khi ngủ 90 phút.', 'Khi rời khỏi phòng tắm, cơ thể hạ nhiệt độ dần giúp kích thích buồn ngủ tự nhiên.', 'bite_sized', 'sleep')
-    ''');
+    await db.execute(
+      'CREATE INDEX idx_guide_articles_category '
+      'ON guide_articles(category)',
+    );
   }
 
   Future<void> close() async {

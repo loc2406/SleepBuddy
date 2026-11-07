@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sleep_buddy/features/report/presentation/cubit/setting_state.dart';
-import 'package:sleep_buddy/features/report/presentation/cubit/settting_cubit.dart';
-import 'package:sleep_buddy/features/report/presentation/widgets/report_shell.dart';
-import 'package:sleep_buddy/features/report/presentation/widgets/setting/duration_card.dart';
-import 'package:sleep_buddy/features/report/presentation/widgets/setting/notification_card.dart';
-import 'package:sleep_buddy/features/report/presentation/widgets/setting/theme_mode_card.dart';
-import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/features/analytics/presentation/cubit/setting_state.dart';
+import 'package:sleep_buddy/features/analytics/presentation/cubit/settting_cubit.dart';
+import 'package:sleep_buddy/features/analytics/presentation/widgets/analytics_shell.dart';
+import 'package:sleep_buddy/features/analytics/presentation/widgets/setting/duration_card.dart';
+import 'package:sleep_buddy/features/analytics/presentation/widgets/setting/notification_card.dart';
+import 'package:sleep_buddy/features/analytics/presentation/widgets/setting/theme_mode_card.dart';
+import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   @override
-  Widget build(BuildContext c) => ReportShell(
+  Widget build(BuildContext c) => AnalyticsShell(
     title: 'Thống kê & Cài đặt',
     subtitle: 'Thiết lập nhịp học phù hợp với bạn.',
     section: AnalyticsSection.settings,

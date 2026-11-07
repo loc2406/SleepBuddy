@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/wellness/domain/model/models.dart';
-import 'package:sleep_buddy/features/wellness/presentation/widgets/choice_strip.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
+import 'package:sleep_buddy/features/wellness/presentation/widgets/choice_strip.dart';
 
-class ReportShell extends StatelessWidget {
-  const ReportShell({
+class AnalyticsShell extends StatelessWidget {
+  const AnalyticsShell({
     super.key,
     required this.title,
     required this.subtitle,

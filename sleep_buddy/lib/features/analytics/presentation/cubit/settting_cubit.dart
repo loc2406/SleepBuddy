@@ -1,9 +1,8 @@
-import 'package:flutter/src/foundation/basic_types.dart';
 import 'package:flutter/src/material/app.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_buddy/core/utils/shared_pref.dart';
-import 'package:sleep_buddy/features/report/presentation/cubit/setting_state.dart';
+import 'package:sleep_buddy/features/analytics/presentation/cubit/setting_state.dart';
 
 class SettingCubit extends Cubit<SettingState> {
   SettingCubit() : super(SettingState()) {

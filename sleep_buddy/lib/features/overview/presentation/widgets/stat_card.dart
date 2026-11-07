@@ -22,13 +22,14 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+    width: double.infinity,
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: ColorConstant.backgroundCard.withValues(alpha: 0.88),
       borderRadius: RadiusConstants.mediumCircular,
       border: Border.all(color: ColorConstant.border),
       image: cardBgAsset != null
-          ?  DecorationImage(
+          ? DecorationImage(
               image: AssetImage(cardBgAsset!),
               fit: BoxFit.cover,
               alignment: Alignment.center,
@@ -53,16 +54,14 @@ class StatCard extends StatelessWidget {
 
         Text(
           subtitle,
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 12,
             color: ColorConstant.textTertiary,
           ),
         ),
-
-        const Spacer(),
-
+        const SizedBox(height: 10),
         if (value != null)
           Text(
             value!,
@@ -74,7 +73,6 @@ class StatCard extends StatelessWidget {
               color: valueTextColor ?? ColorConstant.black,
             ),
           ),
-        const Spacer(),
       ],
     ),
   );
