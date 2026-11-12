@@ -4,6 +4,7 @@ import 'package:sleep_buddy/features/home_screen.dart';
 import 'package:sleep_buddy/features/analytics/presentation/screens/guide_detail_screen.dart';
 import 'package:sleep_buddy/features/analytics/presentation/model/guide_detail_model.dart';
 import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
+import 'package:sleep_buddy/features/study_plan/presentation/screens/add_study_task_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -11,7 +12,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const HomeScreen();
+        final initialTab = int.tryParse(state.uri.queryParameters['tab'] ?? '');
+        final startedTaskId = int.tryParse(
+          state.uri.queryParameters['taskId'] ?? '',
+        );
+        return HomeScreen(
+          initialTab: initialTab ?? 0,
+          startedTaskId: startedTaskId,
+        );
       },
     ),
     GoRoute(
@@ -65,6 +73,12 @@ final appRouter = GoRouter(
           article: guide,
           onBack: () => context.pop(),
         );
+      },
+    ),
+    GoRoute(
+      path: '/study-plan/add',
+      builder: (context, state) {
+        return AddStudyTaskScreen();
       },
     ),
   ],

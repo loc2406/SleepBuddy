@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
+import 'package:sleep_buddy/features/study_plan/presentation/model/models.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/planner_style.dart';
 
 /// No status mutation or navigation happens inside this card.
@@ -30,7 +30,7 @@ class LessonCard extends StatelessWidget {
         switch (lesson.status) {
           LessonStatus.notStarted => 'Chưa học',
           LessonStatus.inProgress => 'Đang học',
-          LessonStatus.completed => 'Hoàn thành',
+          LessonStatus.completed => 'Đã học',
         };
     final (priorityText, bg, fg) = switch (lesson.priority) {
       LessonPriority.high => (

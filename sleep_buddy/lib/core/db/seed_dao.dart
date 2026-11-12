@@ -14,48 +14,76 @@ class SeedDao {
       final createdAt = now.toIso8601String();
 
       await tx.insert('profiles', {
-        'display_name': 'Thành Lộc',
+        'display_name': 'User',
         'created_at': createdAt,
       });
 
-      await tx.insert('sleep_settings', {
-        'id': 1,
-        'target_bedtime': '22:45',
-        'reminder_time': '22:15',
-        'reminder_enabled': 1,
-        'target_sleep_minutes': 480,
-      });
+      // await tx.insert('sleep_settings', {
+      //   'id': 1,
+      //   'target_bedtime': '22:45',
+      //   'reminder_time': '22:15',
+      //   'reminder_enabled': 1,
+      //   'target_sleep_minutes': 480,
+      // });
 
-      final subjects = [
-        ['Toán học', '#9470F4', 'assets/images/book.png', 0],
-        ['Tiếng Anh', '#82A7F4', 'assets/images/book.png', 1],
-        ['Vật lý', '#84CC9C', 'assets/images/book.png', 2],
-        ['Lịch sử', '#FFBE68', 'assets/images/book.png', 3],
-        ['Hóa học', '#F2A67E', 'assets/images/book.png', 4],
-      ];
+      // final subjects = [
+      //   ['Toán học', '#9470F4', 'assets/images/book.png', 0],
+      //   ['Tiếng Anh', '#82A7F4', 'assets/images/book.png', 1],
+      //   ['Vật lý', '#84CC9C', 'assets/images/book.png', 2],
+      //   ['Lịch sử', '#FFBE68', 'assets/images/book.png', 3],
+      //   ['Hóa học', '#F2A67E', 'assets/images/book.png', 4],
+      //   ['Tiếng Việt', '#E38DAA', 'assets/images/book.png', 5],
+      //   ['Đạo đức', '#D2A75B', 'assets/images/book.png', 6],
+      //   ['Tự nhiên và Xã hội', '#77BFA3', 'assets/images/book.png', 7],
+      //   ['Khoa học', '#63A6A2', 'assets/images/book.png', 8],
+      //   ['Khoa học tự nhiên', '#5DA6C5', 'assets/images/book.png', 9],
+      //   ['Sinh học', '#7DBE78', 'assets/images/book.png', 10],
+      //   ['Địa lý', '#6DB2A4', 'assets/images/book.png', 11],
+      //   ['Lịch sử và Địa lý', '#C79A6B', 'assets/images/book.png', 12],
+      //   ['Tin học', '#6F9DD8', 'assets/images/book.png', 13],
+      //   ['Công nghệ', '#B28A67', 'assets/images/book.png', 14],
+      //   ['Giáo dục công dân', '#C0A45E', 'assets/images/book.png', 15],
+      //   ['Giáo dục thể chất', '#ED8C78', 'assets/images/book.png', 16],
+      //   ['Âm nhạc', '#CF8BCB', 'assets/images/book.png', 17],
+      //   ['Mỹ thuật', '#E19A9A', 'assets/images/book.png', 18],
+      //   ['Hoạt động trải nghiệm', '#9A91D8', 'assets/images/book.png', 19],
+      //   [
+      //     'Hoạt động trải nghiệm, hướng nghiệp',
+      //     '#8B8FC7',
+      //     'assets/images/book.png',
+      //     20,
+      //   ],
+      //   [
+      //     'Giáo dục quốc phòng và An ninh',
+      //     '#A6A36A',
+      //     'assets/images/book.png',
+      //     21,
+      //   ],
+      //   ['Kinh tế và Pháp luật', '#B58C72', 'assets/images/book.png', 22],
+      // ];
 
-      for (final subject in subjects) {
-        await tx.insert('subjects', {
-          'name': subject[0],
-          'color_hex': subject[1],
-          'image_path': subject[2],
-          'display_order': subject[3],
-        });
-      }
+      // for (final subject in subjects) {
+      //   await tx.insert('subjects', {
+      //     'name': subject[0],
+      //     'color_hex': subject[1],
+      //     'image_path': subject[2],
+      //     'display_order': subject[3],
+      //   });
+      // }
 
-      final subjectRows = await tx.query('subjects', columns: ['id', 'name']);
-      final subjectIds = {
-        for (final row in subjectRows) row['name'] as String: row['id'] as int,
-      };
+      // final subjectRows = await tx.query('subjects', columns: ['id', 'name']);
+      // final subjectIds = {
+      //   for (final row in subjectRows) row['name'] as String: row['id'] as int,
+      // };
 
-      for (var offset = 0; offset < 7; offset++) {
-        final date = _dateOnly(
-          now.subtract(Duration(days: now.weekday - 1)),
-        ).add(Duration(days: offset));
-        await _seedWeekDayTasks(tx, date, subjectIds);
-      }
+      // for (var offset = 0; offset < 7; offset++) {
+      //   final date = _dateOnly(
+      //     now.subtract(Duration(days: now.weekday - 1)),
+      //   ).add(Duration(days: offset));
+      //   await _seedWeekDayTasks(tx, date, subjectIds);
+      // }
 
-      await _seedSessions(tx, now, subjectIds);
+      // await _seedSessions(tx, now, subjectIds);
       await _seedSleep(tx, now);
       await _seedGoals(tx, now);
       await _seedGuideSteps(tx);
@@ -71,7 +99,7 @@ class SeedDao {
           'key': entry.key,
           'value': entry.value,
           'updated_at': createdAt,
-        });
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
       }
     });
   }
@@ -133,7 +161,6 @@ class SeedDao {
         'priority': lesson[5],
         'status': lesson[6],
         'image_path': 'assets/images/book.png',
-        'estimated_minutes': 60,
         'created_at': createdAt,
         'updated_at': createdAt,
       });

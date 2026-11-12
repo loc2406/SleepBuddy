@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sleep_buddy/core/constants/asset_constants.dart';
 import 'package:sleep_buddy/core/constants/color_constant.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/core/utils/responsive.dart';
-import 'package:sleep_buddy/core/db/dashboard_dao.dart';
-import 'package:sleep_buddy/core/db/profile_dao.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/daily_gold_card.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/next_task_card.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/stat_card.dart';
-import 'package:sleep_buddy/features/overview/presentation/widgets/time_distribution_card.dart';
+import 'package:sleep_buddy/features/overview/cubit/overview_cubit.dart';
+import 'package:sleep_buddy/features/overview/cubit/overview_state.dart';
+import 'package:sleep_buddy/features/overview/widgets/daily_gold_card.dart';
+import 'package:sleep_buddy/features/overview/widgets/next_task_card.dart';
+import 'package:sleep_buddy/features/overview/widgets/stat_card.dart';
+import 'package:sleep_buddy/features/overview/widgets/time_distribution_card.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -18,49 +19,27 @@ class OverviewScreen extends StatefulWidget {
 }
 
 class _OverviewScreenState extends State<OverviewScreen> {
-  bool _isLoading = true;
-  String _displayName = 'Người dùng';
-  int _studyMinutes = 0;
-  int _restMinutes = 0;
-  Map<String, dynamic>? _nextTask;
-  Map<String, int> _subjectMinutes = {};
+  late final OverviewCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final now = DateTime.now();
-    final displayName = await ProfileDao.getDisplayName();
-    final durations = await DashboardDao.getStudyAndBreakDuration(now);
-    final nextTask = await DashboardDao.getNextTask(now);
-    final subjectMinutes = await DashboardDao.getStudyMinutesBySubject(
-      now.subtract(const Duration(days: 1)),
-      now,
-    );
-    if (!mounted) return;
-    setState(() {
-      _displayName = displayName;
-      _studyMinutes = durations['focus_minutes'] ?? 0;
-      _restMinutes = durations['break_minutes'] ?? 0;
-      _nextTask = nextTask;
-      _subjectMinutes = subjectMinutes;
-      _isLoading = false;
-    });
+    _cubit = context.read<OverviewCubit>();
+    _cubit.loadData();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<OverviewCubit, OverviewState>(
+    builder: (context, state) => Scaffold(
       backgroundColor: AppStyle.pageBackground(context),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Xin chào, $_displayName!',
+              'Xin chào!',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -79,8 +58,22 @@ class _OverviewScreenState extends State<OverviewScreen> {
         ),
       ),
       body: SafeArea(
-        child: _isLoading
+        child: state.isLoading
             ? const Center(child: CircularProgressIndicator())
+            : state.loadError != null
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Không thể tải dữ liệu: ${state.loadError}'),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: _cubit.loadData,
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              )
             : LayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
@@ -118,7 +111,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  '\n\n${_formatVietnameseDate(DateTime.now())}',
+                                  '\n\n${_formatVietnameseDate(state.currentTime)}',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: AppStyle.ink(context),
@@ -129,25 +122,28 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            _buildHeaderCard(width),
+                            _buildHeaderCard(width, state),
                             const SizedBox(height: 16),
                             DailyGoalCard(
-                              completed: Duration(minutes: _studyMinutes),
-                              goal: const Duration(hours: 5),
+                              completedTasks: state.completedTasks,
+                              totalTasks: state.totalTasks,
+                              remainingDuration: state.timeUntilEndOfDay,
                             ),
                             const SizedBox(height: 16),
-                            _nextTask == null
+                            state.nextTask == null
                                 ? const SizedBox.shrink()
                                 : NextTaskCard(
-                                    title: _nextTask!['title'] as String,
+                                    title: state.nextTask!['title'] as String,
                                     startTime: _timeOfDay(
-                                      _nextTask!['scheduled_start'] as String,
+                                      state.nextTask!['scheduled_start']
+                                          as String,
                                     ),
                                     endTime: _timeOfDay(
-                                      _nextTask!['scheduled_end'] as String,
+                                      state.nextTask!['scheduled_end']
+                                          as String,
                                     ),
                                     priorityLabel: _priorityLabel(
-                                      _nextTask!['priority'] as String,
+                                      state.nextTask!['priority'] as String,
                                     ),
                                     priorityColor: const Color(
                                       0xFFD81722,
@@ -165,13 +161,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               entries: [
                                 TimeDistributionEntry(
                                   label: 'Học tập',
-                                  duration: Duration(minutes: _studyMinutes),
+                                  duration: Duration(
+                                    minutes: state.studyMinutes,
+                                  ),
                                   color: const Color(0xFF9377F6),
                                   gradientEnd: const Color(0xFFA58BEF),
                                 ),
                                 TimeDistributionEntry(
                                   label: 'Nghỉ ngơi',
-                                  duration: Duration(minutes: _restMinutes),
+                                  duration: Duration(
+                                    minutes: state.restMinutes,
+                                  ),
                                   color: const Color(0xFF6BC88C),
                                   gradientEnd: const Color(0xFFA1D7A1),
                                 ),
@@ -186,17 +186,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 },
               ),
       ),
-    );
-  }
+    ),
+  );
 
-  Widget _buildHeaderCard(double width) {
+  Widget _buildHeaderCard(double width, OverviewState state) {
     final studyCard = StatCard(
       icTitle: Image.asset(AssetConstants.graduation, width: 24),
       title: 'Học tập hôm nay',
-      subtitle: _subjectMinutes.isEmpty
+      subtitle: state.subjectMinutes.isEmpty
           ? 'Chưa ghi nhận phiên học'
-          : '${_subjectMinutes.length} môn đã ghi nhận',
-      value: _durationLabel(Duration(minutes: _studyMinutes)),
+          : '${state.subjectMinutes.length} môn đã ghi nhận',
+      value: _durationLabel(Duration(minutes: state.studyMinutes)),
       valueTextColor: ColorConstant.textDark,
       cardBgAsset: AppStyle.dark(context)
           ? AssetConstants.cardStudyBgDark
@@ -205,14 +205,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
     final restCard = StatCard(
       icTitle: Image.asset(AssetConstants.bed, width: 24),
       title: 'Nghỉ ngơi hôm nay',
-      subtitle: _restMinutes == 0
+      subtitle: state.restMinutes == 0
           ? 'Chưa ghi nhận nghỉ ngơi'
-          : '$_restMinutes phút đã ghi nhận',
-      value: _durationLabel(Duration(minutes: _restMinutes)),
+          : '${state.restMinutes} phút đã ghi nhận',
+      value: _durationLabel(Duration(minutes: state.restMinutes)),
       valueTextColor: ColorConstant.textDark,
       cardBgAsset: AppStyle.dark(context)
           ? AssetConstants.cardRestBgDark
-          : AssetConstants.cardStudyBg,
+          : AssetConstants.cardRestBg,
     );
 
     return Row(

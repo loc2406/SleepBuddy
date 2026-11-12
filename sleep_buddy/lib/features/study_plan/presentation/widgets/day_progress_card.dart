@@ -45,7 +45,7 @@ class DayProgressCard extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   subtitle ??
-                      '$totalLessons bài học hôm nay • $completedLessons bài hoàn thành',
+                      '$totalLessons bài học hôm nay • $completedLessons bài đã học',
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.2,

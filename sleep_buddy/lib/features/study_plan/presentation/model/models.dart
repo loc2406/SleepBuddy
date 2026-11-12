@@ -31,6 +31,42 @@ class StudyLesson {
   final ImageProvider image;
 }
 
+@immutable
+class StudySubject {
+  const StudySubject({
+    required this.id,
+    required this.name,
+    required this.colorHex,
+    this.imagePath,
+  });
+
+  final int id;
+  final String name;
+  final String colorHex;
+  final String? imagePath;
+}
+
+@immutable
+class CreateStudyTaskInput {
+  const CreateStudyTaskInput({
+    required this.subjectId,
+    required this.title,
+    required this.lessonDate,
+    required this.startTime,
+    required this.endTime,
+    this.description = '',
+    this.priority = LessonPriority.medium,
+  });
+
+  final int subjectId;
+  final String title;
+  final String description;
+  final DateTime lessonDate;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
+  final LessonPriority priority;
+}
+
 /// Text and counts are provided by the caller, so filters also support APIs
 /// that load only one page of lessons at a time.
 @immutable

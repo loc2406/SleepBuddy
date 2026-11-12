@@ -4,32 +4,27 @@ import 'package:sleep_buddy/core/config/app_style.dart';
 class DailyGoalCard extends StatelessWidget {
   const DailyGoalCard({
     super.key,
-    required this.completed,
-    required this.goal,
-    this.title = 'Tiến độ mục tiêu ngày',
-    this.remainingLabel = 'Còn lại',
+    required this.completedTasks,
+    required this.totalTasks,
+    required this.remainingDuration,
+    this.title = 'Tiến độ nhiệm vụ hôm nay',
+    this.remainingLabel = 'Đến hết ngày',
     this.durationFormatter,
     this.icon = const AssetImage('assets/images/target.png'),
     this.background = const AssetImage('assets/images/goal-background.png'),
   });
 
-  final Duration completed;
-  final Duration goal;
+  final int completedTasks;
+  final int totalTasks;
+  final Duration remainingDuration;
   final String title;
   final String remainingLabel;
   final String Function(Duration)? durationFormatter;
   final ImageProvider icon;
   final ImageProvider background;
 
-  double get progress => goal.inMilliseconds <= 0
-      ? 0
-      : (completed.inMilliseconds / goal.inMilliseconds).clamp(0.0, 1.0);
-
-  Duration get remaining {
-    final safeGoal = goal.isNegative ? Duration.zero : goal;
-    final safeCompleted = completed.isNegative ? Duration.zero : completed;
-    return safeGoal > safeCompleted ? safeGoal - safeCompleted : Duration.zero;
-  }
+  double get progress =>
+      totalTasks <= 0 ? 0 : (completedTasks / totalTasks).clamp(0.0, 1.0);
 
   static String _format(Duration value) {
     final minutes = value.inMinutes;
@@ -58,7 +53,7 @@ class DailyGoalCard extends StatelessWidget {
           ),
           SizedBox(height: 7 * s),
           Text(
-            (durationFormatter ?? _format)(remaining),
+            (durationFormatter ?? _format)(remainingDuration),
             style: TextStyle(
               fontSize: 28 * s,
               fontWeight: FontWeight.w600,

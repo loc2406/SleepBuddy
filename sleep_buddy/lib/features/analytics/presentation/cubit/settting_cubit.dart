@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_buddy/core/utils/shared_pref.dart';
 import 'package:sleep_buddy/core/db/settings_dao.dart';
+import 'package:sleep_buddy/core/notifications/task_reminder_notifications.dart';
 import 'package:sleep_buddy/features/analytics/presentation/cubit/setting_state.dart';
 
 class SettingCubit extends Cubit<SettingState> {
@@ -45,6 +46,7 @@ class SettingCubit extends Cubit<SettingState> {
     if (isEnabled) {
       emit(state.copyWith(notificationEnabled: false));
       await SettingsDao.setBool('notifications_enabled', false);
+      await TaskReminderNotifications.instance.cancelAll();
       return;
     } else {
       var status = await Permission.notification.status;
@@ -56,6 +58,7 @@ class SettingCubit extends Cubit<SettingState> {
       if (status.isGranted) {
         emit(state.copyWith(notificationEnabled: true));
         await SettingsDao.setBool('notifications_enabled', true);
+        await TaskReminderNotifications.instance.syncScheduledReminders();
         return;
       }
 
@@ -75,6 +78,7 @@ class SettingCubit extends Cubit<SettingState> {
     final status = await Permission.notification.status;
     emit(state.copyWith(notificationEnabled: status.isGranted));
     await SettingsDao.setBool('notifications_enabled', status.isGranted);
+    await TaskReminderNotifications.instance.syncScheduledReminders();
   }
 
   Future<void> changeFinishSound() async {

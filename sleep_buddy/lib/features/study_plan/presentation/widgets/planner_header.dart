@@ -38,12 +38,7 @@ class PlannerHeader extends StatelessWidget {
                     color: PlannerStyle.ink(context),
                   ),
                 ),
-                Image.asset(
-                  'assets/images/calendar-date.png',
-                  width: 19,
-                  height: 19,
-                  excludeFromSemantics: true,
-                ),
+                Icon(Icons.calendar_month, color: ColorConstant.primary, size: 24,),
               ],
             ),
             const SizedBox(height: 8),
@@ -61,7 +56,7 @@ class PlannerHeader extends StatelessWidget {
       IconButton(
         onPressed: onAddMissionPressed,
         tooltip: 'Thêm nhiệm vụ',
-        icon: Icon(Icons.add, color: ColorConstant.primary, size: 29),
+        icon: Icon(Icons.add, color: ColorConstant.primary, size: 32),
       ),
     ],
   );

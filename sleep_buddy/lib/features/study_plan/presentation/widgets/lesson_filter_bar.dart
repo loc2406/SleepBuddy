@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
+import 'package:sleep_buddy/features/study_plan/presentation/model/models.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/planner_style.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 

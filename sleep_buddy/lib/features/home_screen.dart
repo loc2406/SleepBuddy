@@ -1,5 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/core/db/guide_article_dao.dart';
 import 'package:sleep_buddy/core/db/settings_dao.dart';
@@ -7,14 +9,18 @@ import 'package:sleep_buddy/core/db/sleep_dao.dart';
 import 'package:sleep_buddy/core/db/study_task_dao.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
-import 'package:sleep_buddy/features/overview/presentation/screens/overview_screen.dart';
+import 'package:sleep_buddy/features/overview/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/screens/models.dart';
+import 'package:sleep_buddy/features/study_plan/presentation/model/models.dart';
+import 'package:sleep_buddy/features/study_plan/presentation/cubit/study_planner_cubit.dart';
 import 'package:sleep_buddy/features/wellness/presentation/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.initialTab = 0, this.startedTaskId});
+
+  final int initialTab;
+  final int? startedTaskId;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -24,36 +30,39 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<Widget> _screens = [];
   bool _isLoading = true;
-  late DateTime selectedDate;
-  late List<DateTime> days;
-  late String dateLabel;
-  late final List<StudyLesson> lessons;
-  late final int totalLessons;
-  late final int completedLessons;
-  late final List<PlannerFilterItem> filters;
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialTab.clamp(0, 4);
     _loadDatabaseData();
+    if (_currentIndex == 1) {
+      context.read<StudyPlannerCubit>().loadLessons();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialTab != oldWidget.initialTab ||
+        widget.startedTaskId != oldWidget.startedTaskId) {
+      setState(() => _currentIndex = widget.initialTab.clamp(0, 4));
+      _loadDatabaseData();
+      context.read<StudyPlannerCubit>().loadLessons();
+    }
   }
 
   Future<void> _loadDatabaseData() async {
     final now = DateTime.now();
-    selectedDate = DateTime(now.year, now.month, now.day);
-    final weekStart = selectedDate.subtract(
-      Duration(days: selectedDate.weekday - 1),
-    );
-    days = List.generate(7, (index) => weekStart.add(Duration(days: index)));
-    dateLabel =
-        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
-
-    lessons = await StudyTaskDao.getByDate(selectedDate);
-    totalLessons = lessons.length;
-    completedLessons = lessons
+    final selectedDate = DateTime(now.year, now.month, now.day);
+    final lessons = await StudyTaskDao.getByDate(selectedDate);
+    final startedTask = widget.startedTaskId == null
+        ? null
+        : await StudyTaskDao.getById(widget.startedTaskId!);
+    final totalLessons = lessons.length;
+    final completedLessons = lessons
         .where((lesson) => lesson.status == LessonStatus.completed)
         .length;
-    filters = await StudyTaskDao.getFilterItems(selectedDate);
     final guides = await GuideArticleDao.getAll();
     final sleepData = await SleepDao.getLatest();
     final studyMinutes = await SettingsDao.getInt('study_duration_minutes', 30);
@@ -82,15 +91,15 @@ class _HomeScreenState extends State<HomeScreen> {
       _screens = [
         const OverviewScreen(),
         StudyPlannerScreen(
-          days: days,
-          selectedDate: selectedDate,
-          dateLabel: dateLabel,
-          lessons: lessons,
-          totalLessons: totalLessons,
-          completedLessons: completedLessons,
-          filters: filters,
+          onAddMissionPressed: () async {
+            final created = await context.push<bool>('/study-plan/add');
+            return created == true;
+          },
         ),
         FocusRestScreen(
+          subtitle: startedTask == null
+              ? 'Học tập hiệu quả, nghỉ ngơi đúng cách!'
+              : 'Đang học: ${startedTask.title}',
           timeText: '${studyMinutes.toString().padLeft(2, '0')}:00',
           timerLabel: 'Thời gian học tập',
           timerProgress: 0.25,

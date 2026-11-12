@@ -63,7 +63,6 @@ class AppDatabase {
         priority TEXT NOT NULL DEFAULT 'medium',
         status TEXT NOT NULL DEFAULT 'notStarted',
         image_path TEXT,
-        estimated_minutes INTEGER NOT NULL DEFAULT 0,
         completed_at TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
