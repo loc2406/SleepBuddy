@@ -7,14 +7,14 @@ import 'package:sleep_buddy/core/db/guide_article_dao.dart';
 import 'package:sleep_buddy/core/db/settings_dao.dart';
 import 'package:sleep_buddy/core/db/sleep_dao.dart';
 import 'package:sleep_buddy/core/db/study_task_dao.dart';
-import 'package:sleep_buddy/features/focus_rest/presentation/screens/focus_rest_screen.dart';
-import 'package:sleep_buddy/features/focus_rest/presentation/screens/models.dart';
+import 'package:sleep_buddy/features/focus_rest/screens/focus_rest_screen.dart';
+import 'package:sleep_buddy/features/focus_rest/screens/models.dart';
 import 'package:sleep_buddy/features/overview/screens/overview_screen.dart';
-import 'package:sleep_buddy/features/analytics/presentation/screens/analytics_screen.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/screens/study_planner_screen.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/model/models.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/cubit/study_planner_cubit.dart';
-import 'package:sleep_buddy/features/wellness/presentation/screens/sleep_screen.dart';
+import 'package:sleep_buddy/features/analytics/screens/analytics_screen.dart';
+import 'package:sleep_buddy/features/study_plan/screens/study_planner_screen.dart';
+import 'package:sleep_buddy/features/study_plan/model/models.dart';
+import 'package:sleep_buddy/features/study_plan/cubit/study_planner_cubit.dart';
+import 'package:sleep_buddy/features/wellness/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.initialTab = 0, this.startedTaskId});

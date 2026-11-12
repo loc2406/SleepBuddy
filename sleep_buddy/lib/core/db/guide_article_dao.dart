@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sleep_buddy/core/db/app_db.dart';
-import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
 
 class GuideArticleDao {
   static const String table = 'guide_articles';

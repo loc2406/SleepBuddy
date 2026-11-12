@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/db/app_db.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/model/models.dart';
+import 'package:sleep_buddy/features/study_plan/model/models.dart';
 
 class StudyTaskDao {
   static Future<List<StudySubject>> getSubjects() async {

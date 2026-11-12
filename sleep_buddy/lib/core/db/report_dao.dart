@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/db/app_db.dart';
-import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
 
 class ReportDao {
   static Future<ReportData> getReport(ReportPeriod period, DateTime now) async {

@@ -8,13 +8,13 @@ import 'package:sleep_buddy/core/router/app_router.dart';
 import 'package:sleep_buddy/core/theme/app_theme.dart';
 import 'package:sleep_buddy/core/utils/shared_pref.dart';
 import 'package:sleep_buddy/core/notifications/task_reminder_notifications.dart';
-import 'package:sleep_buddy/features/analytics/presentation/cubit/library_cubit.dart';
+import 'package:sleep_buddy/features/analytics/cubit/library_cubit.dart';
 import 'package:sleep_buddy/features/overview/cubit/overview_cubit.dart';
-import 'package:sleep_buddy/features/analytics/presentation/cubit/analytics_cubit.dart';
-import 'package:sleep_buddy/features/analytics/presentation/cubit/setting_state.dart';
-import 'package:sleep_buddy/features/analytics/presentation/cubit/settting_cubit.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/cubit/add_new_study_plan_cubit.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/cubit/study_planner_cubit.dart';
+import 'package:sleep_buddy/features/analytics/cubit/analytics_cubit.dart';
+import 'package:sleep_buddy/features/analytics/cubit/setting_state.dart';
+import 'package:sleep_buddy/features/analytics/cubit/settting_cubit.dart';
+import 'package:sleep_buddy/features/study_plan/cubit/add_new_study_plan_cubit.dart';
+import 'package:sleep_buddy/features/study_plan/cubit/study_planner_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

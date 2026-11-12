@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_buddy/features/home_screen.dart';
-import 'package:sleep_buddy/features/analytics/presentation/screens/guide_detail_screen.dart';
-import 'package:sleep_buddy/features/analytics/presentation/model/guide_detail_model.dart';
-import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
-import 'package:sleep_buddy/features/study_plan/presentation/screens/add_study_task_screen.dart';
+import 'package:sleep_buddy/features/analytics/screens/guide_detail_screen.dart';
+import 'package:sleep_buddy/features/analytics/model/guide_detail_model.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
+import 'package:sleep_buddy/features/study_plan/screens/add_study_task_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',

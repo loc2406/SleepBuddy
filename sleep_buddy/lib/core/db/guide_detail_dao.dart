@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/db/app_db.dart';
-import 'package:sleep_buddy/features/analytics/presentation/model/guide_detail_model.dart';
-import 'package:sleep_buddy/features/analytics/presentation/models/models.dart';
+import 'package:sleep_buddy/features/analytics/model/guide_detail_model.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
 
 class GuideDetailDao {
   static Future<GuideDetailData?> getByArticle(GuideArticle article) async {
