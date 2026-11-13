@@ -45,7 +45,7 @@ class _FocusRestScreenState extends State<FocusRestScreen> {
     super.initState();
     _cubit = context.read<FocusRestCubit>();
     final currentState = _cubit.state;
-    if (widget.taskId == null ||
+    if (
         currentState.taskId != widget.taskId ||
         currentState.status == FocusRestStatus.idle ||
         currentState.status == FocusRestStatus.loading) {
@@ -291,27 +291,36 @@ class _FocusRestScreenState extends State<FocusRestScreen> {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Nhiệm vụ đã kết thúc!'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (state.taskTitle != null) ...[
-              Text(state.taskTitle!),
-              const SizedBox(height: 12),
+      builder: (dialogContext) => Theme(
+        data: AppStyle.dialogTheme(dialogContext),
+        child: AlertDialog(
+          title: const Text('Nhiệm vụ đã kết thúc!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (state.taskTitle != null) ...[
+                Text(
+                  state.taskTitle!,
+                  style: TextStyle(
+                    color: AppStyle.ink(dialogContext),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              Text('Thời gian học: ${_formatDuration(state.studyDuration)}'),
+              const SizedBox(height: 6),
+              Text('Thời gian nghỉ: ${_formatDuration(state.restDuration)}'),
             ],
-            Text('Thời gian học: ${_formatDuration(state.studyDuration)}'),
-            const SizedBox(height: 6),
-            Text('Thời gian nghỉ: ${_formatDuration(state.restDuration)}'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Đóng'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Đóng'),
-          ),
-        ],
       ),
     );
     if (mounted) _cubit.acknowledgeSummary();

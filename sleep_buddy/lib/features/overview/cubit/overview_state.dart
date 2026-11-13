@@ -1,5 +1,16 @@
 import 'package:flutter/foundation.dart';
 
+enum OverviewChartPeriod { today, yesterday, week, month }
+
+extension OverviewChartPeriodLabel on OverviewChartPeriod {
+  String get label => switch (this) {
+    OverviewChartPeriod.today => 'Hôm nay',
+    OverviewChartPeriod.yesterday => 'Hôm qua',
+    OverviewChartPeriod.week => 'Tuần này',
+    OverviewChartPeriod.month => 'Tháng này',
+  };
+}
+
 @immutable
 class OverviewState {
   const OverviewState({
@@ -12,7 +23,12 @@ class OverviewState {
     this.totalTasks = 0,
     this.nextTask,
     this.subjectMinutes = const {},
+    this.chartPeriod = OverviewChartPeriod.today,
+    this.chartStudyMinutes = 0,
+    this.chartRestMinutes = 0,
+    this.isChartLoading = false,
     this.loadError,
+    this.chartError,
   });
 
   final bool isLoading;
@@ -22,9 +38,14 @@ class OverviewState {
   final int totalTasks;
   final Map<String, dynamic>? nextTask;
   final Map<String, int> subjectMinutes;
+  final OverviewChartPeriod chartPeriod;
+  final int chartStudyMinutes;
+  final int chartRestMinutes;
+  final bool isChartLoading;
   final DateTime currentTime;
   final Duration timeUntilEndOfDay;
   final Object? loadError;
+  final Object? chartError;
 
   OverviewState copyWith({
     bool? isLoading,
@@ -35,10 +56,16 @@ class OverviewState {
     Map<String, dynamic>? nextTask,
     bool clearNextTask = false,
     Map<String, int>? subjectMinutes,
+    OverviewChartPeriod? chartPeriod,
+    int? chartStudyMinutes,
+    int? chartRestMinutes,
+    bool? isChartLoading,
     DateTime? currentTime,
     Duration? timeUntilEndOfDay,
     Object? loadError,
     bool clearLoadError = false,
+    Object? chartError,
+    bool clearChartError = false,
   }) => OverviewState(
     isLoading: isLoading ?? this.isLoading,
     studyMinutes: studyMinutes ?? this.studyMinutes,
@@ -47,8 +74,13 @@ class OverviewState {
     totalTasks: totalTasks ?? this.totalTasks,
     nextTask: clearNextTask ? null : nextTask ?? this.nextTask,
     subjectMinutes: subjectMinutes ?? this.subjectMinutes,
+    chartPeriod: chartPeriod ?? this.chartPeriod,
+    chartStudyMinutes: chartStudyMinutes ?? this.chartStudyMinutes,
+    chartRestMinutes: chartRestMinutes ?? this.chartRestMinutes,
+    isChartLoading: isChartLoading ?? this.isChartLoading,
     currentTime: currentTime ?? this.currentTime,
     timeUntilEndOfDay: timeUntilEndOfDay ?? this.timeUntilEndOfDay,
     loadError: clearLoadError ? null : loadError ?? this.loadError,
+    chartError: clearChartError ? null : chartError ?? this.chartError,
   );
 }

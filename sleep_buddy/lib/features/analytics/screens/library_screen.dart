@@ -7,7 +7,7 @@ import 'package:sleep_buddy/features/analytics/cubit/library_state.dart';
 import 'package:sleep_buddy/features/analytics/widgets/guide_card.dart';
 import 'package:sleep_buddy/features/analytics/widgets/analytics_shell.dart';
 import 'package:sleep_buddy/features/analytics/model/models.dart';
-import 'package:sleep_buddy/features/wellness/widgets/choice_strip.dart';
+import 'package:sleep_buddy/features/sleep/widgets/choice_strip.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key, this.onSectionChanged});

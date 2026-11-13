@@ -83,12 +83,14 @@ class StudyTaskDao {
     });
   }
 
-  static Future<List<({int id, String title, DateTime startsAt})>>
+  static Future<
+    List<({int id, String title, DateTime startsAt, LessonPriority priority})>
+  >
   getPendingTaskReminders() async {
     final db = await AppDatabase.instance.database;
     final rows = await db.rawQuery(
       '''
-      SELECT id, title, lesson_date, scheduled_start
+      SELECT id, title, lesson_date, scheduled_start, priority
       FROM study_tasks
       WHERE status = ?
       ORDER BY lesson_date ASC, scheduled_start ASC
@@ -103,6 +105,7 @@ class StudyTaskDao {
         id: row['id'] as int,
         title: row['title'] as String,
         startsAt: DateTime.parse('${date}T$time'),
+        priority: LessonPriority.values.byName(row['priority'] as String),
       );
     }).toList();
   }

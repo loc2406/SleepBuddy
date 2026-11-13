@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/analytics/widgets/report_cards.dart';
-import 'package:sleep_buddy/features/analytics/model/models.dart';
-import 'package:sleep_buddy/features/wellness/widgets/app_shell.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
+import 'package:sleep_buddy/features/analytics/widgets/report_cards.dart';
+import 'package:sleep_buddy/features/sleep/widgets/app_shell.dart';
 
 class ReportScreen extends StatelessWidget {
   const ReportScreen({
@@ -21,14 +21,11 @@ class ReportScreen extends StatelessWidget {
   final VoidCallback? onNotification;
   final double maxContentWidth;
   @override
-  Widget build(BuildContext c) => WellnessShell(
+  Widget build(BuildContext c) => AppShell(
     title: 'Thống kê & Cài đặt',
     subtitle: 'Nhìn lại tiến bộ, tìm nhịp học phù hợp.',
-    navigationIndex: 4,
     section: AnalyticsSection.report,
     onSectionChanged: onSectionChanged,
-    onNavigation: onNavigation,
-    onNotification: onNotification,
     maxContentWidth: maxContentWidth,
     children: [
       Row(
@@ -93,7 +90,14 @@ class ReportScreen extends StatelessWidget {
         },
       ),
       StudyTimeChartCard(points: data.dailyBars, title: data.chartTitle),
-      SubjectTimeCard(subjects: data.subjects),
+      SubjectTimeCard(
+        subjects: data.subjects,
+        title: switch (data.period) {
+          ReportPeriod.day => 'Thời gian theo môn học trong ngày',
+          ReportPeriod.week => 'Thời gian theo môn học trong tuần',
+          ReportPeriod.month => 'Thời gian theo môn học trong tháng',
+        },
+      ),
       PlanCompletionCard(
         completed: data.completedLessons,
         total: data.totalLessons,
@@ -109,9 +113,9 @@ class _ReportPeriodPicker extends StatelessWidget {
   final ValueChanged<ReportPeriod>? onChanged;
 
   static String _label(ReportPeriod period) => switch (period) {
-    ReportPeriod.day => 'Theo ngày',
-    ReportPeriod.week => 'Theo tuần',
-    ReportPeriod.month => 'Theo tháng',
+    ReportPeriod.day => 'Hôm nay',
+    ReportPeriod.week => 'Tuần này',
+    ReportPeriod.month => 'Tháng này',
   };
 
   @override

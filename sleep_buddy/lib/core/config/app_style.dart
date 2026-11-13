@@ -33,6 +33,152 @@ abstract final class AppStyle {
     return dark(c) ? const Color(0xFF49405E) : const Color(0xFFDDD6EA);
   }
 
+  static ThemeData dialogTheme(BuildContext context) {
+    final background = surface(context);
+    final foreground = ink(context);
+    final secondary = muted(context);
+    final outline = border(context);
+    final softSurface = tinted(context);
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(22),
+      side: BorderSide(color: outline),
+    );
+    final actionShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    );
+    final inputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: outline),
+    );
+    final colorScheme = Theme.of(context).colorScheme.copyWith(
+      primary: purple,
+      onPrimary: Colors.white,
+      surface: background,
+      onSurface: foreground,
+      outline: outline,
+    );
+
+    return Theme.of(context).copyWith(
+      colorScheme: colorScheme,
+      dialogTheme: DialogThemeData(
+        backgroundColor: background,
+        surfaceTintColor: Colors.transparent,
+        elevation: 8,
+        shape: shape,
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: foreground,
+        ),
+        contentTextStyle: TextStyle(
+          fontSize: 14,
+          height: 1.4,
+          color: secondary,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: background,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: purple,
+        headerForegroundColor: Colors.white,
+        shape: shape,
+        weekdayStyle: TextStyle(color: secondary, fontWeight: FontWeight.w600),
+        dayStyle: TextStyle(color: foreground),
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return Colors.white;
+          if (states.contains(WidgetState.disabled)) {
+            return secondary.withValues(alpha: .45);
+          }
+          return foreground;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected) ? purple : null;
+        }),
+        todayForegroundColor: WidgetStatePropertyAll<Color?>(purple),
+        todayBorder: const BorderSide(color: purple),
+        yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? Colors.white
+              : foreground;
+        }),
+        yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected) ? purple : null;
+        }),
+        rangeSelectionBackgroundColor: softSurface,
+      ),
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: background,
+        shape: shape,
+        hourMinuteColor: softSurface,
+        hourMinuteTextColor: foreground,
+        hourMinuteTextStyle: TextStyle(
+          fontSize: 48,
+          fontWeight: FontWeight.w700,
+          color: foreground,
+        ),
+        dayPeriodColor: softSurface,
+        dayPeriodTextColor: foreground,
+        dialBackgroundColor: softSurface,
+        dialHandColor: purple,
+        dialTextColor: foreground,
+        entryModeIconColor: purple,
+        helpTextStyle: TextStyle(color: secondary, fontWeight: FontWeight.w600),
+        cancelButtonStyle: TextButton.styleFrom(
+          foregroundColor: secondary,
+          shape: actionShape,
+        ),
+        confirmButtonStyle: FilledButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: purple,
+          shape: actionShape,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationThemeData(
+        filled: true,
+        fillColor: softSurface,
+        hintStyle: TextStyle(color: secondary),
+        labelStyle: TextStyle(color: secondary),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
+        border: inputBorder,
+        enabledBorder: inputBorder,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: purple, width: 1.5),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: purple,
+          shape: actionShape,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: purple,
+          shape: actionShape,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: foreground,
+          backgroundColor: softSurface,
+          side: BorderSide(color: outline),
+          shape: actionShape,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          alignment: Alignment.centerLeft,
+        ),
+      ),
+    );
+  }
+
+  static Widget modalBuilder(BuildContext context, Widget? child) =>
+      Theme(data: dialogTheme(context), child: child!);
+
   static Color border(BuildContext c) =>
       dark(c) ? const Color(0xFF463B61) : const Color(0xFFECE7FA);
   static Color tinted(BuildContext c) =>

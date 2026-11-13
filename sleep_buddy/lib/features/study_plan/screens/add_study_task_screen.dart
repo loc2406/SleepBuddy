@@ -46,15 +46,7 @@ class _AddStudyTaskScreenState extends State<AddStudyTaskScreen> {
       initialDate: currentDate.isBefore(today) ? today : currentDate,
       firstDate: today,
       lastDate: DateTime.now().add(const Duration(days: 365 * 3)),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppStyle.purple,
-            surface: AppStyle.surface(context),
-          ),
-        ),
-        child: child!,
-      ),
+      builder: AppStyle.modalBuilder,
     );
     if (picked != null && mounted) {
       _cubit.selectLessonDate(picked);
@@ -65,15 +57,7 @@ class _AddStudyTaskScreenState extends State<AddStudyTaskScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: isStart ? _cubit.state.startTime : _cubit.state.endTime,
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(
-            primary: AppStyle.purple,
-            surface: AppStyle.surface(context),
-          ),
-        ),
-        child: child!,
-      ),
+      builder: AppStyle.modalBuilder,
     );
     if (picked != null && mounted) {
       if (isStart) {
@@ -91,97 +75,82 @@ class _AddStudyTaskScreenState extends State<AddStudyTaskScreen> {
       builder: (dialogContext) {
         final subjectFormKey = GlobalKey<FormState>();
 
-        return BlocBuilder<AddNewStudyPlanCubit, AddNewStudyPlanState>(
-          builder: (context, state) => AlertDialog(
-            backgroundColor: AppStyle.surface(context),
-            surfaceTintColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: AppStyle.border(context)),
-            ),
-            title: Text(
-              'Thêm môn học mới',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: AppStyle.ink(context),
-              ),
-            ),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Form(
-                key: subjectFormKey,
-                child: TextFormField(
-                  controller: _subjectNameController,
-                  textCapitalization: TextCapitalization.sentences,
-                  autofocus: true,
-                  decoration: _inputDecoration(
-                    context,
-                    hint: 'Ví dụ: Ngữ văn, Sinh học...',
-                  ),
-                  validator: (value) {
-                    return _cubit.validateSubjectName(value);
-                  },
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: state.isAddingSubject
-                    ? null
-                    : () => Navigator.pop(dialogContext),
-                child: Text(
-                  'Hủy',
-                  style: TextStyle(color: AppStyle.muted(context)),
-                ),
-              ),
-              FilledButton(
-                onPressed: state.isAddingSubject
-                    ? null
-                    : () async {
-                        if (!subjectFormKey.currentState!.validate()) return;
-                        try {
-                          final subject = await _cubit.addSubject(
-                            _subjectNameController.text,
-                          );
-                          if (!dialogContext.mounted) return;
-                          Navigator.pop(dialogContext, true);
-                          if (!mounted) return;
-                          _showMessage('Đã thêm môn học "${subject.name}".');
-                        } on StateError catch (error) {
-                          if (!dialogContext.mounted) return;
-                          ScaffoldMessenger.of(dialogContext)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(content: Text(error.message.toString())),
-                            );
-                        } on ArgumentError catch (error) {
-                          if (!dialogContext.mounted) return;
-                          ScaffoldMessenger.of(dialogContext)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(content: Text(error.message.toString())),
-                            );
-                        } on Exception {
-                          if (!dialogContext.mounted) return;
-                          ScaffoldMessenger.of(dialogContext)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('Không thể thêm môn học.'),
-                              ),
-                            );
-                        }
-                      },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppStyle.purple,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+        return Theme(
+          data: AppStyle.dialogTheme(dialogContext),
+          child: BlocBuilder<AddNewStudyPlanCubit, AddNewStudyPlanState>(
+            builder: (context, state) => AlertDialog(
+              title: const Text('Thêm môn học mới'),
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Form(
+                  key: subjectFormKey,
+                  child: TextFormField(
+                    controller: _subjectNameController,
+                    textCapitalization: TextCapitalization.sentences,
+                    autofocus: true,
+                    decoration: _inputDecoration(
+                      context,
+                      hint: 'Ví dụ: Ngữ văn, Sinh học...',
+                    ),
+                    validator: (value) {
+                      return _cubit.validateSubjectName(value);
+                    },
                   ),
                 ),
-                child: Text(state.isAddingSubject ? 'Đang lưu...' : 'Thêm'),
               ),
-            ],
+              actions: [
+                TextButton(
+                  onPressed: state.isAddingSubject
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: const Text('Hủy'),
+                ),
+                FilledButton(
+                  onPressed: state.isAddingSubject
+                      ? null
+                      : () async {
+                          if (!subjectFormKey.currentState!.validate()) return;
+                          try {
+                            final subject = await _cubit.addSubject(
+                              _subjectNameController.text,
+                            );
+                            if (!dialogContext.mounted) return;
+                            Navigator.pop(dialogContext, true);
+                            if (!mounted) return;
+                            _showMessage('Đã thêm môn học "${subject.name}".');
+                          } on StateError catch (error) {
+                            if (!dialogContext.mounted) return;
+                            ScaffoldMessenger.of(dialogContext)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(error.message.toString()),
+                                ),
+                              );
+                          } on ArgumentError catch (error) {
+                            if (!dialogContext.mounted) return;
+                            ScaffoldMessenger.of(dialogContext)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(error.message.toString()),
+                                ),
+                              );
+                          } on Exception {
+                            if (!dialogContext.mounted) return;
+                            ScaffoldMessenger.of(dialogContext)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                const SnackBar(
+                                  content: Text('Không thể thêm môn học.'),
+                                ),
+                              );
+                          }
+                        },
+                  child: Text(state.isAddingSubject ? 'Đang lưu...' : 'Thêm'),
+                ),
+              ],
+            ),
           ),
         );
       },

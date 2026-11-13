@@ -26,15 +26,6 @@ class NotificationCard extends StatelessWidget {
           onSwitchChanged: onNotificationsChanged,
           actionKey: const ValueKey('notifications-switch'),
         ),
-        Divider(height: 1, color: AppStyle.border(c)),
-        SettingRow(
-          title: 'Chuông hết giờ',
-          subtitle: 'Phát âm thanh khi kết thúc phiên',
-          icon: Icons.timer,
-          switchValue: soundEnabled,
-          onSwitchChanged: onSoundChanged,
-          actionKey: const ValueKey('sound-switch'),
-        ),
       ],
     ),
   );

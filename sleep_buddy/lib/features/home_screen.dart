@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/core/db/guide_article_dao.dart';
-import 'package:sleep_buddy/core/db/sleep_dao.dart';
+import 'package:sleep_buddy/features/analytics/model/models.dart';
 import 'package:sleep_buddy/features/focus_rest/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/screens/models.dart';
 import 'package:sleep_buddy/features/focus_rest/cubit/focus_rest_cubit.dart';
@@ -13,7 +13,7 @@ import 'package:sleep_buddy/features/overview/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/analytics/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/screens/study_planner_screen.dart';
 import 'package:sleep_buddy/features/study_plan/cubit/study_planner_cubit.dart';
-import 'package:sleep_buddy/features/wellness/screens/sleep_screen.dart';
+import 'package:sleep_buddy/features/sleep/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -76,18 +76,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadDatabaseData() async {
     final guides = await GuideArticleDao.getAll();
-    final sleepData = await SleepDao.getLatest();
-    final List <RecoveryGuide> recoveryGuide = guides.isEmpty
+    final List<RecoveryGuide> relaxGuide = guides.isEmpty
         ? []
-        : guides.where((e)=> e.category.name == 'relax').map(
-            (e) => RecoveryGuide(
-              id: e.id,
-              tag: "Thư giãn",
-              title: e.title,
-              readTime: e.readTimeLabel,
-              thumbnail: e.image,
-            ),
-          ).toList();
+        : guides
+              .where((e) => e.category.name == 'relax')
+              .map(
+                (e) => RecoveryGuide(
+                  id: e.id,
+                  tag: "Thư giãn",
+                  title: e.title,
+                  readTime: e.readTimeLabel,
+                  thumbnail: e.image,
+                ),
+              )
+              .toList();
+
+              final List<GuideArticle> sleepGuide = guides.isEmpty
+        ? []
+        : guides
+              .where((e) => e.category.name == 'sleep')
+              .toList();
 
     if (!mounted) return;
     setState(() {
@@ -105,13 +113,23 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() => _currentIndex = 1);
             _plannerCubit.loadLessons();
           },
-          guides: recoveryGuide,
+          onGuideTap: (guide) {
+            final article = guides.firstWhere(
+              (article) => article.id == guide.id,
+            );
+            _openGuide(article);
+          },
+          guides: relaxGuide,
         ),
-        SleepScreen(data: sleepData, guides: guides),
+        SleepScreen(guides: sleepGuide, onGuideOpen: _openGuide),
         const AnalyticsScreen(),
       ];
       _isLoading = false;
     });
+  }
+
+  void _openGuide(GuideArticle article) {
+    context.push('/guide/${article.id}', extra: article);
   }
 
   @override

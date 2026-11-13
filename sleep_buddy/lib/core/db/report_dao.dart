@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/db/app_db.dart';
 import 'package:sleep_buddy/features/analytics/model/models.dart';
@@ -75,15 +76,10 @@ class ReportDao {
             ((row['total_seconds'] as num?)?.toDouble() ?? 0) / 3600,
     };
 
-    final labels = period == ReportPeriod.day
-        ? ['Hôm nay']
-        : period == ReportPeriod.month
-        ? ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4', 'Tuần 5']
-        : ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     final dailyBars = period == ReportPeriod.day
         ? [StudyBar(label: 'Hôm nay', hours: dailyMap[startText] ?? 0)]
         : period == ReportPeriod.month
-        ? _monthBars(range.start, dailyMap)
+        ? monthBars(range.start, dailyMap)
         : _weekBars(range.start, dailyMap);
 
     return ReportData(
@@ -101,9 +97,7 @@ class ReportDao {
       },
       studyTime: Duration(seconds: studySeconds),
       restTime: Duration(seconds: restSeconds),
-      dailyBars: dailyBars.isEmpty
-          ? labels.map((label) => StudyBar(label: label, hours: 0)).toList()
-          : dailyBars,
+      dailyBars: dailyBars,
       subjects: subjectRows.map((row) {
         return SubjectDuration(
           name: row['name'] as String,
@@ -132,17 +126,23 @@ class ReportDao {
     });
   }
 
-  static List<StudyBar> _monthBars(
+  @visibleForTesting
+  static List<StudyBar> monthBars(
     DateTime monthStart,
     Map<String, double> dailyMap,
   ) {
     final result = <StudyBar>[];
-    final daysInMonth = DateTime(monthStart.year, monthStart.month + 1, 0).day;
-    final weekCount = (daysInMonth / 7).ceil();
+    final firstWeekStart = monthStart.subtract(
+      Duration(days: monthStart.weekday - 1),
+    );
+    final lastDay = DateTime(monthStart.year, monthStart.month + 1, 0);
+    final lastWeekStart = lastDay.subtract(Duration(days: lastDay.weekday - 1));
+    final weekCount = lastWeekStart.difference(firstWeekStart).inDays ~/ 7 + 1;
+
     for (var week = 0; week < weekCount; week++) {
       var hours = 0.0;
       for (var day = 0; day < 7; day++) {
-        final date = monthStart.add(Duration(days: week * 7 + day));
+        final date = firstWeekStart.add(Duration(days: week * 7 + day));
         if (date.month != monthStart.month) continue;
         hours += dailyMap[_dateText(date)] ?? 0;
       }

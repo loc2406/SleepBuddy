@@ -45,8 +45,8 @@ lib/
       cubit/ screens/ widgets/
     study_plan/
       cubit/ model/ screens/ widgets/
-    wellness/
-      screens/
+    sleep/
+      cubit/ screens/ widgets/
     home_screen.dart
 test/
 ```
@@ -90,12 +90,16 @@ Mẫu chính:
 
 - Nhiệm vụ học: [`lib/core/db/study_task_dao.dart`](lib/core/db/study_task_dao.dart).
 - Phiên học/nghỉ: [`lib/core/db/focus_session_dao.dart`](lib/core/db/focus_session_dao.dart); mỗi lần đổi tab Phiên học/Nghỉ ngơi đóng một đoạn và bắt đầu đoạn tiếp theo trong `focus_sessions`.
-- Số liệu tổng quan: [`lib/core/db/dashboard_dao.dart`](lib/core/db/dashboard_dao.dart).
-- Báo cáo: [`lib/core/db/report_dao.dart`](lib/core/db/report_dao.dart).
+- Số liệu tổng quan: [`lib/core/db/dashboard_dao.dart`](lib/core/db/dashboard_dao.dart). Biểu đồ phân bổ thời gian hỗ trợ hôm nay, hôm qua, tuần hiện tại và tháng hiện tại; các kỳ tuần/tháng lấy tổng học/nghỉ từ phiên đã lưu.
+- Báo cáo: [`lib/core/db/report_dao.dart`](lib/core/db/report_dao.dart). Các chỉ số, biểu đồ giờ học, thời gian theo môn và hoàn thành kế hoạch dùng cùng kỳ ngày/tuần/tháng; biểu đồ tháng gom theo các tuần lịch (Thứ 2–Chủ nhật).
 - Giấc ngủ: [`lib/core/db/sleep_dao.dart`](lib/core/db/sleep_dao.dart).
 - Cài đặt: [`lib/core/db/settings_dao.dart`](lib/core/db/settings_dao.dart).
 - Cẩm nang: [`lib/core/db/guide_article_dao.dart`](lib/core/db/guide_article_dao.dart) và [`lib/core/db/guide_detail_dao.dart`](lib/core/db/guide_detail_dao.dart).
 - Nhắc nhiệm vụ: [`lib/core/notifications/task_reminder_notifications.dart`](lib/core/notifications/task_reminder_notifications.dart).
+
+Nhắc bắt đầu nhiệm vụ được gửi vào đúng `scheduled_start`, không gửi sớm hơn dựa trên mức ưu tiên. Mức ưu tiên chỉ điều chỉnh độ nổi bật: cao dùng thông báo nổi bật/có âm thanh, trung bình dùng mức thông thường, thấp dùng thông báo yên lặng. Thời điểm hiển thị thực tế vẫn phụ thuộc vào quyền thông báo, cài đặt kênh của Android/iOS và chính sách tiết kiệm pin của thiết bị.
+
+Màn hình Giấc ngủ sử dụng [`lib/features/sleep/cubit/sleep_cubit.dart`](lib/features/sleep/cubit/sleep_cubit.dart) và [`lib/features/sleep/cubit/sleep_state.dart`](lib/features/sleep/cubit/sleep_state.dart) để đọc/ghi nhật ký và kế hoạch ngủ qua `SleepDao`. Nhật ký được gắn với ngày thức dậy; giờ ngủ muộn hơn giờ thức dậy được tính là đêm hôm trước. Không cho lưu giờ thức dậy trong tương lai hoặc khoảng ngủ từ 24 giờ trở lên. Người dùng có thể ghi/chỉnh giờ ngủ, giờ thức dậy, ghi chú và cảm nhận, đồng thời chỉnh giờ ngủ mục tiêu, giờ nhắc và bật/tắt nhắc. Nhật ký mẫu không được seed; màn hình mới sẽ hiển thị trạng thái chưa ghi nhận. Nhắc ngủ dùng giờ cục bộ đã cài trong `sleep_settings` và chỉ được lên lịch khi cả nhắc ngủ lẫn thông báo ứng dụng đều bật; nếu giờ nhắc hôm nay đã qua, lịch tiếp theo là ngày mai.
 
 ## Nguồn demo/hardcode — không dùng làm chuẩn dữ liệu
 
@@ -106,7 +110,7 @@ Mẫu chính:
 - [`lib/features/analytics/presentation/screens/analytics_screen.dart`](lib/features/analytics/presentation/screens/analytics_screen.dart) đọc báo cáo thật qua `ReportDao`, nhưng tự quản lý tải dữ liệu bằng `StatefulWidget`; dùng nó để hiểu nguồn báo cáo, không dùng làm mẫu Cubit mới.
 - `features/new_feat/` và các thư mục feature chưa có luồng đang hoạt động không phải mẫu kiến trúc đã được xác nhận.
 
-`SleepScreen` nhận dữ liệu từ `SleepDao` thông qua `HomeScreen`, nhưng các callback tương tác hiện chưa được nối đầy đủ. Chỉ dùng để tham khảo giao diện cho đến khi luồng nghiệp vụ đó được hoàn thiện.
+`SleepScreen` đọc state từ `SleepCubit`; `HomeScreen` chỉ ghép màn hình và danh sách cẩm nang. `SeedDao` không tạo nhật ký ngủ giả. Các nhật ký đã được tạo bởi bản demo cũ không bị tự động xóa.
 
 `test/widget_test.dart` hiện là test mẫu Flutter kiểu counter, không phản ánh hành vi sản phẩm. Khi kiểm tra thay đổi, ưu tiên test có liên quan trực tiếp trong `test/`; không dùng test mẫu này làm đặc tả.
 
@@ -116,6 +120,7 @@ Mẫu chính:
 - Với tính năng mới, ưu tiên mẫu data-driven của `overview` hoặc `study_plan`; không suy luận nghiệp vụ từ dữ liệu hardcode/seed.
 - Giữ nguyên quy ước tên trạng thái và luồng cập nhật hiện có; cập nhật DAO, state, screen và các call site liên quan đồng bộ.
 - Tác vụ cần cập nhật mỗi phút dùng `MinuteTickerCubit`; Cubit feature đăng ký subscription và hủy trong `close()`.
+- Hộp thoại và bộ chọn ngày/giờ dùng `AppStyle.dialogTheme` hoặc `AppStyle.modalBuilder` để thống nhất màu sắc, bề mặt, viền và trạng thái chọn ở cả theme sáng/tối.
 - `FocusRestCubit` dùng ticker chung để bù thời gian khi ứng dụng quay lại foreground, đồng thời chạy timer 1 giây chỉ khi có task đang tập trung để hiển thị đếm ngược/counters. Hết `scheduled_end`, Cubit đóng đoạn hiện tại, lưu tổng thời gian và chuyển task sang `completed`; notification kết thúc mở lại tab Tập trung và tổng kết.
 - Hiển thị lỗi rõ ràng theo mẫu state/UI của feature; không âm thầm trả dữ liệu giả khi tải thất bại, bám sát style thiết kế của app.
 - Chỉ thêm test cho hành vi mới hoặc lỗi được sửa, và chạy analyzer/test nhỏ nhất bao phủ phần thay đổi.

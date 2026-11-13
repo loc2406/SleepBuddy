@@ -179,6 +179,7 @@ class AddNewStudyPlanCubit extends Cubit<AddNewStudyPlanState> {
           id: taskId,
           title: title.trim(),
           startsAt: startDateTime,
+          priority: formState.priority,
         );
       } on Exception {
         return StudyTaskSaveResult.savedButReminderFailed;

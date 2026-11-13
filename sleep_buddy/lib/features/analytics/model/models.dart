@@ -18,18 +18,24 @@ class SleepData {
     required this.targetBedtime,
     required this.reminderTime,
     required this.reminderEnabled,
+    this.appNotificationsEnabled = false,
     required this.mood,
-    this.periodLabel = 'Đêm qua · 02 – 03/11',
-    this.recommendation = 'Bắt đầu nhẹ nhàng và nghỉ đều giữa các phiên.',
+    this.periodLabel = 'Chưa ghi nhận',
+    this.recommendation = 'Ghi nhận giấc ngủ để xem tóm tắt và gợi ý.',
+    this.notes,
   });
-  final DateTime bedTime, wakeTime;
+  final DateTime? bedTime, wakeTime;
 
   /// May be calculated externally from recorded timestamps, less awakenings.
   final Duration recordedDuration, targetDuration;
   final TimeOfDay targetBedtime, reminderTime;
   final bool reminderEnabled;
+  final bool appNotificationsEnabled;
   final SleepMood mood;
+  final String? notes;
   final String periodLabel, recommendation;
+
+  bool get hasRecord => bedTime != null && wakeTime != null;
 }
 
 @immutable

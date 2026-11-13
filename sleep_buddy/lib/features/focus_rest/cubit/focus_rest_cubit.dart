@@ -78,7 +78,7 @@ class FocusRestCubit extends Cubit<FocusRestState> {
             plannedDuration: plannedDuration,
             studyDuration: totals.study,
             restDuration: totals.rest,
-            summaryPending: taskId != null,
+            summaryPending: false,
           ),
         );
         return;

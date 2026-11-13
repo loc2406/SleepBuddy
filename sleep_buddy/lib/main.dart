@@ -16,6 +16,7 @@ import 'package:sleep_buddy/features/analytics/cubit/settting_cubit.dart';
 import 'package:sleep_buddy/features/study_plan/cubit/add_new_study_plan_cubit.dart';
 import 'package:sleep_buddy/features/study_plan/cubit/study_planner_cubit.dart';
 import 'package:sleep_buddy/features/focus_rest/cubit/focus_rest_cubit.dart';
+import 'package:sleep_buddy/features/sleep/cubit/sleep_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ Future<void> main() async {
       appRouter.go('/?tab=2&taskId=$taskId');
     },
     onOpenPlanner: () => appRouter.go('/?tab=1'),
+    onOpenSleep: () => appRouter.go('/?tab=3'),
     onTaskStartRejected: () => appRouter.go('/?tab=1&startRejected=true'),
   );
   await TaskReminderNotifications.instance.handleLaunchDetails();
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
               FocusRestCubit(minuteTicker: context.read<MinuteTickerCubit>()),
           lazy: false,
         ),
+        BlocProvider(create: (_) => SleepCubit(), lazy: false),
         BlocProvider(create: (_) => AnalyticsCubit()),
         BlocProvider(create: (_) => SettingCubit()),
         BlocProvider(create: (_) => LibraryCubit()),

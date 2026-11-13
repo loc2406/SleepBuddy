@@ -48,30 +48,40 @@ class SettingCubit extends Cubit<SettingState> {
       await SettingsDao.setBool('notifications_enabled', false);
       await TaskReminderNotifications.instance.cancelAll();
       return;
-    } else {
-      var status = await Permission.notification.status;
+    }
 
-      if (status.isDenied) {
-        status = await Permission.notification.request();
-      }
+    var status = await Permission.notification.status;
 
-      if (status.isGranted) {
-        emit(state.copyWith(notificationEnabled: true));
-        await SettingsDao.setBool('notifications_enabled', true);
-        await TaskReminderNotifications.instance.syncScheduledReminders();
-        return;
-      }
+    if (status.isDenied) {
+      status = await Permission.notification.request();
+    }
 
-      if (status.isPermanentlyDenied) {
-        emit(state.copyWith(notificationEnabled: false));
-        await SettingsDao.setBool('notifications_enabled', false);
-        await openAppSettings();
-        return;
-      }
-
+    if (status.isPermanentlyDenied) {
       emit(state.copyWith(notificationEnabled: false));
       await SettingsDao.setBool('notifications_enabled', false);
+      await openAppSettings();
+      return;
     }
+
+    if (!status.isGranted) {
+      emit(state.copyWith(notificationEnabled: false));
+      await SettingsDao.setBool('notifications_enabled', false);
+      return;
+    }
+
+    // Android 12 trở lên cần quyền này để đặt thông báo đúng giờ.
+    final exactAlarmGranted = await TaskReminderNotifications.instance
+        .requestExactAlarmPermission();
+
+    if (!exactAlarmGranted) {
+      emit(state.copyWith(notificationEnabled: false));
+      await SettingsDao.setBool('notifications_enabled', false);
+      return;
+    }
+
+    emit(state.copyWith(notificationEnabled: true));
+    await SettingsDao.setBool('notifications_enabled', true);
+    await TaskReminderNotifications.instance.syncScheduledReminders();
   }
 
   Future<void> syncNotificationPermission() async {

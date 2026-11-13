@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_buddy/features/wellness/widgets/choice_strip.dart';
+import 'package:sleep_buddy/features/sleep/widgets/choice_strip.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 
 class ThemeModeCard extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/features/analytics/widgets/setting/setting_row.dart';
 import 'package:sleep_buddy/features/analytics/model/models.dart';
-import 'package:sleep_buddy/features/wellness/widgets/choice_strip.dart';
+import 'package:sleep_buddy/features/sleep/widgets/choice_strip.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 
 class SleepSummaryCard extends StatelessWidget {
@@ -35,7 +35,9 @@ class SleepSummaryCard extends StatelessWidget {
               LabelBadge(data.periodLabel),
               const SizedBox(height: 10),
               Text(
-                durationLabel(data.recordedDuration),
+                data.hasRecord
+                    ? durationLabel(data.recordedDuration)
+                    : 'Chưa ghi nhận',
                 style: TextStyle(
                   fontSize: 34,
                   height: 1.15,
@@ -73,38 +75,42 @@ class SleepSummaryCard extends StatelessWidget {
                 ),
               const SizedBox(height: 10),
               Text(
-                'Mục tiêu ${durationLabel(data.targetDuration)} • ${missing == Duration.zero ? 'Đạt mục tiêu' : 'Còn thiếu ${durationLabel(missing)}'}',
+                data.hasRecord
+                    ? 'Mục tiêu ${durationLabel(data.targetDuration)} • ${missing == Duration.zero ? 'Đạt mục tiêu' : 'Còn thiếu ${durationLabel(missing)}'}'
+                    : 'Ghi nhận giờ ngủ và thức dậy để xem tiến độ mục tiêu.',
                 style: TextStyle(
                   fontSize: 12.5,
                   height: 1.35,
                   color: AppStyle.muted(c),
                 ),
               ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: GradientProgress(
-                      value: fraction,
-                      label: 'Mục tiêu giấc ngủ',
+              if (data.hasRecord) ...[
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GradientProgress(
+                        value: fraction,
+                        label: 'Mục tiêu giấc ngủ',
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '${(fraction * 100).round()}%',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppStyle.purple,
-                      fontWeight: FontWeight.w700,
+                    const SizedBox(width: 12),
+                    Text(
+                      '${(fraction * 100).round()}%',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppStyle.purple,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 9),
-              Text(
-                'Thời lượng tính từ giờ ngủ và thức dậy',
-                style: TextStyle(fontSize: 10.5, color: AppStyle.muted(c)),
-              ),
+                  ],
+                ),
+                const SizedBox(height: 9),
+                Text(
+                  'Thời lượng tính từ giờ ngủ và thức dậy',
+                  style: TextStyle(fontSize: 10.5, color: AppStyle.muted(c)),
+                ),
+              ],
             ],
           );
         },
@@ -120,10 +126,43 @@ class SleepRecordCard extends StatelessWidget {
     required this.wakeTime,
     this.onEdit,
   });
-  final DateTime bedTime, wakeTime;
+  final DateTime? bedTime, wakeTime;
   final VoidCallback? onEdit;
   @override
   Widget build(BuildContext c) {
+    if (bedTime == null || wakeTime == null) {
+      return WellnessCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Chưa có nhật ký giấc ngủ',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppStyle.ink(c),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Ghi lại giờ đi ngủ và thức dậy để bắt đầu theo dõi.',
+              style: TextStyle(fontSize: 12, color: AppStyle.muted(c)),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                key: const ValueKey('edit-sleep'),
+                onPressed: onEdit,
+                child: const Text('Ghi nhận giấc ngủ'),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final actualBedTime = bedTime!;
+    final actualWakeTime = wakeTime!;
     Widget info(String label, String asset, DateTime value) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -160,14 +199,15 @@ class SleepRecordCard extends StatelessWidget {
         children: [
           LayoutBuilder(
             builder: (c, box) {
-              final left = info('Đi ngủ', 'bed', bedTime),
-                  right = info('Thức dậy', 'timer-nav', wakeTime);
+              final left = info('Đi ngủ', 'bed', actualBedTime),
+                  right = info('Thức dậy', 'timer-nav', actualWakeTime);
               if (box.maxWidth < 240 ||
-                  MediaQuery.textScalerOf(c).scale(14) > 23)
+                  MediaQuery.textScalerOf(c).scale(14) > 23) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [left, const SizedBox(height: 18), right],
                 );
+              }
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -188,10 +228,7 @@ class SleepRecordCard extends StatelessWidget {
             child: TextButton(
               key: const ValueKey('edit-sleep'),
               onPressed: onEdit,
-              child: const Text(
-                'Chỉnh sửa',
-                style: TextStyle(fontSize: 11, color: AppStyle.purple),
-              ),
+              child: const Text('Chỉnh sửa'),
             ),
           ),
         ],
@@ -207,12 +244,16 @@ class SleepPlanCard extends StatelessWidget {
     required this.reminderTime,
     required this.reminderEnabled,
     this.onBedtimeTap,
+    this.onReminderTimeTap,
     this.onReminderChanged,
+    this.appNotificationsEnabled = true,
   });
   final TimeOfDay bedtime, reminderTime;
   final bool reminderEnabled;
   final VoidCallback? onBedtimeTap;
+  final VoidCallback? onReminderTimeTap;
   final ValueChanged<bool>? onReminderChanged;
+  final bool appNotificationsEnabled;
   @override
   Widget build(BuildContext c) => WellnessCard(
     child: Column(
@@ -241,10 +282,19 @@ class SleepPlanCard extends StatelessWidget {
         ),
         Divider(height: 1, color: AppStyle.border(c)),
         SettingRow(
-          title: 'Nhắc chuẩn bị ngủ',
-          subtitle: '${timeLabel(reminderTime)} · Trước giờ ngủ',
+          title: 'Giờ nhắc chuẩn bị ngủ',
+          value: timeLabel(reminderTime),
+          onTap: onReminderTimeTap,
+          actionKey: const ValueKey('sleep-reminder-time'),
+        ),
+        Divider(height: 1, color: AppStyle.border(c)),
+        SettingRow(
+          title: 'Bật nhắc chuẩn bị ngủ',
+          subtitle: reminderEnabled && !appNotificationsEnabled
+              ? 'Bật thông báo ứng dụng trong Cài đặt để nhận nhắc.'
+              : 'Thông báo được gửi vào giờ đã chọn.',
           switchValue: reminderEnabled,
-          onSwitchChanged: null,
+          onSwitchChanged: () => onReminderChanged?.call(!reminderEnabled),
           actionKey: const ValueKey('sleep-reminder'),
         ),
       ],

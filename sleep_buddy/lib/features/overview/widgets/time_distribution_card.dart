@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
+import 'package:sleep_buddy/features/overview/cubit/overview_state.dart';
 
 @immutable
 class TimeDistributionEntry {
@@ -25,8 +26,8 @@ class TimeDistributionCard extends StatelessWidget {
     super.key,
     required this.entries,
     required this.selectedPeriod,
-    required this.periods,
     required this.onPeriodChanged,
+    this.isLoading = false,
     this.title = 'Biểu đồ phân bổ thời gian',
     this.totalLabel = 'Tổng cộng',
     this.durationFormatter,
@@ -35,9 +36,9 @@ class TimeDistributionCard extends StatelessWidget {
   });
 
   final List<TimeDistributionEntry> entries;
-  final String selectedPeriod;
-  final List<String> periods;
-  final ValueChanged<String> onPeriodChanged;
+  final OverviewChartPeriod selectedPeriod;
+  final ValueChanged<OverviewChartPeriod> onPeriodChanged;
+  final bool isLoading;
   final String title;
   final String totalLabel;
   final String Function(Duration)? durationFormatter;
@@ -217,13 +218,15 @@ class TimeDistributionCard extends StatelessWidget {
       final picker = Material(
         color: AppStyle.tinted(context),
         borderRadius: BorderRadius.circular(40),
-        child: PopupMenuButton<String>(
+        child: PopupMenuButton<OverviewChartPeriod>(
           initialValue: selectedPeriod,
-          onSelected: onPeriodChanged,
-          enabled: periods.isNotEmpty,
-          itemBuilder: (context) => periods
-              .toSet()
-              .map((p) => PopupMenuItem(value: p, child: Text(p)))
+          onSelected: (period) => onPeriodChanged(period),
+          enabled: !isLoading,
+          itemBuilder: (context) => OverviewChartPeriod.values
+              .map(
+                (period) =>
+                    PopupMenuItem(value: period, child: Text(period.label)),
+              )
               .toList(),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 21 * s, vertical: 12 * s),
@@ -231,7 +234,7 @@ class TimeDistributionCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  selectedPeriod,
+                  selectedPeriod.label,
                   style: TextStyle(
                     fontSize: 24 * s,
                     fontWeight: FontWeight.w500,
@@ -239,11 +242,20 @@ class TimeDistributionCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 7 * s),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 29 * s,
-                  color: AppStyle.ink(context),
-                ),
+                if (isLoading)
+                  SizedBox.square(
+                    dimension: 18 * s,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2 * s,
+                      color: AppStyle.purple,
+                    ),
+                  )
+                else
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 29 * s,
+                    color: AppStyle.ink(context),
+                  ),
               ],
             ),
           ),

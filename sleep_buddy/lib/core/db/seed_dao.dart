@@ -84,7 +84,6 @@ class SeedDao {
       // }
 
       // await _seedSessions(tx, now, subjectIds);
-      await _seedSleep(tx, now);
       await _seedGoals(tx, now);
       await _seedGuideSteps(tx);
 
@@ -198,23 +197,6 @@ class SeedDao {
         });
       }
     }
-  }
-
-  static Future<void> _seedSleep(Transaction tx, DateTime now) async {
-    final yesterday = _dateOnly(now.subtract(const Duration(days: 1)));
-    await tx.insert('sleep_logs', {
-      'log_date': _dateOnly(now).toIso8601String().substring(0, 10),
-      'sleep_start': yesterday.add(const Duration(hours: 23)).toIso8601String(),
-      'sleep_end': _dateOnly(
-        now,
-      ).add(const Duration(hours: 6, minutes: 45)).toIso8601String(),
-      'recorded_sleep_minutes': 465,
-      'target_sleep_minutes': 480,
-      'quality_score': 97,
-      'mood': 'normal',
-      'recommended_workload': 'moderate',
-      'recommendation': 'Bắt đầu nhẹ nhàng và nghỉ đều giữa các phiên.',
-    });
   }
 
   static Future<void> _seedGoals(Transaction tx, DateTime now) async {

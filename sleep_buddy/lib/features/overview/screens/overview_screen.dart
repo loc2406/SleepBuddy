@@ -34,29 +34,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   ) => BlocBuilder<OverviewCubit, OverviewState>(
     builder: (context, state) => Scaffold(
       backgroundColor: AppStyle.pageBackground(context),
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Xin chào!',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppStyle.ink(context),
-              ),
-            ),
-            Text(
-              'Học tập hiệu quả, nghỉ ngơi trọn vẹn nhé!',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-                color: AppStyle.ink(context),
-              ),
-            ),
-          ],
-        ),
-      ),
       body: SafeArea(
         child: state.isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -96,6 +73,37 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Xin chào',
+                                        style: TextStyle(
+                                          fontSize: 21,
+                                          height: 1.2,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppStyle.ink(context),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Học tập hiệu quả, nghỉ ngơi trọn vẹn nhé!',
+                                        style: TextStyle(
+                                          fontSize: 13.5,
+                                          height: 1.35,
+                                          color: AppStyle.muted(context),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                             AspectRatio(
                               aspectRatio: 794 / 230,
                               child: Container(
@@ -154,28 +162,45 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                     onViewSchedule: () {},
                                   ),
                             const SizedBox(height: 16),
-                            TimeDistributionCard(
-                              selectedPeriod: 'Hôm nay',
-                              periods: const ['Hôm nay', 'Hôm qua', 'Tuần này'],
-                              onPeriodChanged: (newPeriod) {},
-                              entries: [
-                                TimeDistributionEntry(
-                                  label: 'Học tập',
-                                  duration: Duration(
-                                    minutes: state.studyMinutes,
+                            BlocListener<OverviewCubit, OverviewState>(
+                              listenWhen: (previous, current) =>
+                                  previous.chartError != current.chartError &&
+                                  current.chartError != null,
+                              listener: (context, state) {
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Không thể tải biểu đồ: ${state.chartError}',
+                                      ),
+                                    ),
+                                  );
+                                _cubit.clearChartError();
+                              },
+                              child: TimeDistributionCard(
+                                selectedPeriod: state.chartPeriod,
+                                isLoading: state.isChartLoading,
+                                onPeriodChanged: _cubit.selectChartPeriod,
+                                entries: [
+                                  TimeDistributionEntry(
+                                    label: 'Học tập',
+                                    duration: Duration(
+                                      minutes: state.chartStudyMinutes,
+                                    ),
+                                    color: const Color(0xFF9377F6),
+                                    gradientEnd: const Color(0xFFA58BEF),
                                   ),
-                                  color: const Color(0xFF9377F6),
-                                  gradientEnd: const Color(0xFFA58BEF),
-                                ),
-                                TimeDistributionEntry(
-                                  label: 'Nghỉ ngơi',
-                                  duration: Duration(
-                                    minutes: state.restMinutes,
+                                  TimeDistributionEntry(
+                                    label: 'Nghỉ ngơi',
+                                    duration: Duration(
+                                      minutes: state.chartRestMinutes,
+                                    ),
+                                    color: const Color(0xFF6BC88C),
+                                    gradientEnd: const Color(0xFFA1D7A1),
                                   ),
-                                  color: const Color(0xFF6BC88C),
-                                  gradientEnd: const Color(0xFFA1D7A1),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             const SizedBox(height: kBottomNavigationBarHeight),
                           ],
