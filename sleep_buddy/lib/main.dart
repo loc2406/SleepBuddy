@@ -20,24 +20,65 @@ import 'package:sleep_buddy/features/sleep/cubit/sleep_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPref.init();
-  await AppDatabase.instance.database;
-  await GuideArticleDao.seedIfEmpty();
-  await DemoDataDao.applyMode(DemoDataMode.populated);
-  await TaskReminderNotifications.instance.initialize(
-    onStartTask: (taskId) async {
-      appRouter.go('/?tab=2&taskId=$taskId');
-    },
-    onOpenFocusTask: (taskId) async {
-      appRouter.go('/?tab=2&taskId=$taskId');
-    },
-    onOpenPlanner: () => appRouter.go('/?tab=1'),
-    onOpenSleep: () => appRouter.go('/?tab=3'),
-    onTaskStartRejected: () => appRouter.go('/?tab=1&startRejected=true'),
-  );
-  await TaskReminderNotifications.instance.handleLaunchDetails();
-  await TaskReminderNotifications.instance.syncScheduledReminders();
+  await _bootstrap();
   runApp(const MyApp());
+}
+
+/// Khởi tạo các dịch vụ nền trước khi hiển thị giao diện.
+///
+/// Mỗi bước được bọc riêng để một lỗi cục bộ (múi giờ lạ, dữ liệu cũ, quyền
+/// thông báo bị từ chối...) không chặn `runApp`, tránh trường hợp bản release
+/// chỉ hiện splash rồi tự tắt trên một số thiết bị.
+Future<void> _bootstrap() async {
+  await _runStartupStep('preferences', SharedPref.init);
+  await _runStartupStep('database', () => AppDatabase.instance.database);
+  await _runStartupStep('guide articles', GuideArticleDao.seedIfEmpty);
+  await _runStartupStep(
+    'demo data',
+    () => DemoDataDao.applyMode(DemoDataMode.populated),
+  );
+
+  final notificationsReady = await _runStartupStep(
+    'notifications',
+    () => TaskReminderNotifications.instance.initialize(
+      onStartTask: (taskId) async {
+        appRouter.go('/?tab=2&taskId=$taskId');
+      },
+      onOpenFocusTask: (taskId) async {
+        appRouter.go('/?tab=2&taskId=$taskId');
+      },
+      onOpenPlanner: () => appRouter.go('/?tab=1'),
+      onOpenSleep: () => appRouter.go('/?tab=3'),
+      onTaskStartRejected: () => appRouter.go('/?tab=1&startRejected=true'),
+    ),
+  );
+  if (!notificationsReady) return;
+
+  await _runStartupStep(
+    'notification launch details',
+    TaskReminderNotifications.instance.handleLaunchDetails,
+  );
+  await _runStartupStep(
+    'notification schedule',
+    TaskReminderNotifications.instance.syncScheduledReminders,
+  );
+}
+
+Future<bool> _runStartupStep(String name, Future<void> Function() step) async {
+  try {
+    await step();
+    return true;
+  } catch (error, stackTrace) {
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'sleep_buddy startup',
+        context: ErrorDescription('while initializing $name'),
+      ),
+    );
+    return false;
+  }
 }
 
 class MyApp extends StatelessWidget {

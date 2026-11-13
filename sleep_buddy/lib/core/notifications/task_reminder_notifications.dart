@@ -58,9 +58,7 @@ class TaskReminderNotifications {
       return;
     }
 
-    tz.initializeTimeZones();
-    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+    await _configureLocalTimeZone();
 
     final initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('ic_notification'),
@@ -91,6 +89,71 @@ class TaskReminderNotifications {
           taskReminderBackgroundResponse,
     );
     _initialized = true;
+  }
+
+  // Một số thiết bị Android trả về múi giờ dạng offset cố định (ví dụ
+  // "GMT+07:00") hoặc mã cũ không có trong cơ sở dữ liệu IANA, khiến
+  // tz.getLocation ném LocationNotFoundException và app không thể khởi động.
+  // Luôn cấu hình được tz.local để ứng dụng vẫn mở bình thường.
+  Future<void> _configureLocalTimeZone() async {
+    tz.initializeTimeZones();
+
+    String? identifier;
+    try {
+      identifier = (await FlutterTimezone.getLocalTimezone()).identifier;
+    } catch (error) {
+      debugPrint('Không đọc được múi giờ thiết bị: $error');
+    }
+
+    final name = identifier?.trim() ?? '';
+    if (name.isNotEmpty) {
+      try {
+        tz.setLocalLocation(tz.getLocation(name));
+        return;
+      } on tz.LocationNotFoundException {
+        debugPrint('Múi giờ "$name" không có trong dữ liệu IANA, dùng offset.');
+      }
+    }
+
+    final offset = _parseFixedOffset(name) ?? DateTime.now().timeZoneOffset;
+    tz.setLocalLocation(_fixedOffsetLocation(offset));
+  }
+
+  static Duration? _parseFixedOffset(String identifier) {
+    final match = RegExp(
+      r'^(?:GMT|UTC)\s*([+-])(\d{1,2})(?::?(\d{2}))?$',
+      caseSensitive: false,
+    ).firstMatch(identifier);
+    if (match == null) return null;
+
+    final sign = match.group(1) == '-' ? -1 : 1;
+    final hours = int.parse(match.group(2)!);
+    final minutes = int.tryParse(match.group(3) ?? '') ?? 0;
+    if (hours > 14 || minutes > 59) return null;
+
+    return Duration(hours: sign * hours, minutes: sign * minutes);
+  }
+
+  static tz.Location _fixedOffsetLocation(Duration offset) {
+    final totalMinutes = offset.inMinutes;
+    final sign = totalMinutes < 0 ? '-' : '+';
+    final absoluteMinutes = totalMinutes.abs();
+    final hours = (absoluteMinutes ~/ 60).toString().padLeft(2, '0');
+    final minutes = (absoluteMinutes % 60).toString().padLeft(2, '0');
+    final name = 'UTC$sign$hours:$minutes';
+
+    return tz.Location(
+      name,
+      [tz.minTime],
+      [0],
+      [
+        tz.TimeZone(
+          offset.inMilliseconds,
+          isDst: false,
+          abbreviation: name,
+        ),
+      ],
+    );
   }
 
   Future<bool> requestExactAlarmPermission() async {
