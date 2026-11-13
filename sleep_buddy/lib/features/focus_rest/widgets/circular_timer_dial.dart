@@ -11,14 +11,10 @@ class CircularTimerDial extends StatelessWidget {
     required this.timeText,
     required this.label,
     required this.progress,
-    required this.isPlaying,
-    required this.onPlayPause,
     this.centerImage = const AssetImage('assets/focus_rest/book-glow.png'),
   });
   final String timeText, label;
   final double progress;
-  final bool isPlaying;
-  final VoidCallback? onPlayPause;
   final ImageProvider centerImage;
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -68,38 +64,6 @@ class CircularTimerDial extends StatelessWidget {
           ),
         ],
       );
-      final button = Container(
-        width: 64,
-        height: 64,
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: .7),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x2F9573E8),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: FocusStyle.primaryGradient,
-          ),
-          child: IconButton(
-            key: const ValueKey('play-pause'),
-            onPressed: onPlayPause,
-            tooltip: isPlaying ? 'Tạm dừng' : 'Bắt đầu / Tiếp tục',
-            icon: Icon(
-              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              size: 32,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      );
       if (largeText) {
         // Content can grow vertically instead of being squeezed into a fixed circle.
         return FocusSurface(
@@ -113,20 +77,17 @@ class CircularTimerDial extends StatelessWidget {
                 color: FocusStyle.purple,
                 backgroundColor: AppStyle.track(context),
               ),
-              const SizedBox(height: 14),
-              button,
             ],
           ),
         );
       }
       return SizedBox(
-        height: diameter + 27,
+        height: diameter,
         child: Center(
           child: SizedBox(
             width: diameter,
-            height: diameter + 27,
+            height: diameter,
             child: Stack(
-              clipBehavior: Clip.none,
               alignment: Alignment.topCenter,
               children: [
                 SizedBox.square(
@@ -150,12 +111,11 @@ class CircularTimerDial extends StatelessWidget {
                 ),
                 Positioned(
                   top: 0,
-                  left: 21,
-                  right: 21,
+                  left: 12,
+                  right: 12,
                   height: diameter,
                   child: Center(child: face),
                 ),
-                Positioned(bottom: 0, child: button),
               ],
             ),
           ),

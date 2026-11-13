@@ -107,16 +107,52 @@ class StudyTaskDao {
     }).toList();
   }
 
+  static Future<List<({int id, String title, DateTime endsAt})>>
+  getInProgressTaskReminders() async {
+    final db = await AppDatabase.instance.database;
+    final rows = await db.rawQuery(
+      '''
+      SELECT id, title, lesson_date, scheduled_end
+      FROM study_tasks
+      WHERE status = ?
+      ORDER BY lesson_date ASC, scheduled_end ASC
+    ''',
+      [LessonStatus.inProgress.name],
+    );
+
+    return rows.map((row) {
+      final date = row['lesson_date'] as String;
+      final time = row['scheduled_end'] as String;
+      return (
+        id: row['id'] as int,
+        title: row['title'] as String,
+        endsAt: DateTime.parse('${date}T$time'),
+      );
+    }).toList();
+  }
+
   static Future<bool> startTaskFromReminder(int id) async {
     final db = await AppDatabase.instance.database;
+    final now = DateTime.now();
+    final dateText = _dateText(now);
+    final timeText = _timeText(TimeOfDay.fromDateTime(now));
     final updated = await db.update(
       'study_tasks',
       {
         'status': LessonStatus.inProgress.name,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': now.toIso8601String(),
       },
-      where: 'id = ? AND status = ?',
-      whereArgs: [id, LessonStatus.notStarted.name],
+      where: '''
+        id = ? AND status = ? AND lesson_date = ?
+        AND scheduled_start <= ? AND scheduled_end > ?
+      ''',
+      whereArgs: [
+        id,
+        LessonStatus.notStarted.name,
+        dateText,
+        timeText,
+        timeText,
+      ],
     );
     return updated > 0;
   }
@@ -261,27 +297,6 @@ class StudyTaskDao {
       [_dateText(date)],
     );
     return result.first['count'] as int;
-  }
-
-  static Future<int> completeExpiredInProgressTasks(DateTime now) async {
-    final db = await AppDatabase.instance.database;
-    final dateText = _dateText(now);
-    final timeText = _timeText(TimeOfDay.fromDateTime(now));
-
-    return db.update(
-      'study_tasks',
-      {
-        'status': LessonStatus.completed.name,
-        'completed_at': now.toIso8601String(),
-        'updated_at': now.toIso8601String(),
-      },
-      where: '''
-        status = ? AND (
-          lesson_date < ? OR (lesson_date = ? AND scheduled_end <= ?)
-        )
-      ''',
-      whereArgs: [LessonStatus.inProgress.name, dateText, dateText, timeText],
-    );
   }
 
   static Future<({int completed, int total})> getTaskProgressByDate(

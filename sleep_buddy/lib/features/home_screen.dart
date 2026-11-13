@@ -4,23 +4,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_buddy/core/config/app_style.dart';
 import 'package:sleep_buddy/core/db/guide_article_dao.dart';
-import 'package:sleep_buddy/core/db/settings_dao.dart';
 import 'package:sleep_buddy/core/db/sleep_dao.dart';
-import 'package:sleep_buddy/core/db/study_task_dao.dart';
 import 'package:sleep_buddy/features/focus_rest/screens/focus_rest_screen.dart';
 import 'package:sleep_buddy/features/focus_rest/screens/models.dart';
+import 'package:sleep_buddy/features/focus_rest/cubit/focus_rest_cubit.dart';
+import 'package:sleep_buddy/features/focus_rest/cubit/focus_rest_state.dart';
 import 'package:sleep_buddy/features/overview/screens/overview_screen.dart';
 import 'package:sleep_buddy/features/analytics/screens/analytics_screen.dart';
 import 'package:sleep_buddy/features/study_plan/screens/study_planner_screen.dart';
-import 'package:sleep_buddy/features/study_plan/model/models.dart';
 import 'package:sleep_buddy/features/study_plan/cubit/study_planner_cubit.dart';
 import 'package:sleep_buddy/features/wellness/screens/sleep_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.initialTab = 0, this.startedTaskId});
+  const HomeScreen({
+    super.key,
+    this.initialTab = 0,
+    this.startedTaskId,
+    this.startRejected = false,
+  });
 
   final int initialTab;
   final int? startedTaskId;
+  final bool startRejected;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,14 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<Widget> _screens = [];
   bool _isLoading = true;
+  late final StudyPlannerCubit _plannerCubit;
+  late final FocusRestCubit _focusCubit;
 
   @override
   void initState() {
     super.initState();
+    _plannerCubit = context.read<StudyPlannerCubit>();
+    _focusCubit = context.read<FocusRestCubit>();
     _currentIndex = widget.initialTab.clamp(0, 4);
     _loadDatabaseData();
     if (_currentIndex == 1) {
-      context.read<StudyPlannerCubit>().loadLessons();
+      _plannerCubit.loadLessons();
+    }
+    if (_focusCubit.state.status == FocusRestStatus.completed) {
+      _plannerCubit.loadLessons();
+    }
+    if (widget.startRejected) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showStartRejectedMessage();
+      });
     }
   }
 
@@ -48,43 +65,29 @@ class _HomeScreenState extends State<HomeScreen> {
         widget.startedTaskId != oldWidget.startedTaskId) {
       setState(() => _currentIndex = widget.initialTab.clamp(0, 4));
       _loadDatabaseData();
-      context.read<StudyPlannerCubit>().loadLessons();
+      _plannerCubit.loadLessons();
+    }
+    if (widget.startRejected && !oldWidget.startRejected) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showStartRejectedMessage();
+      });
     }
   }
 
   Future<void> _loadDatabaseData() async {
-    final now = DateTime.now();
-    final selectedDate = DateTime(now.year, now.month, now.day);
-    final lessons = await StudyTaskDao.getByDate(selectedDate);
-    final startedTask = widget.startedTaskId == null
-        ? null
-        : await StudyTaskDao.getById(widget.startedTaskId!);
-    final totalLessons = lessons.length;
-    final completedLessons = lessons
-        .where((lesson) => lesson.status == LessonStatus.completed)
-        .length;
     final guides = await GuideArticleDao.getAll();
     final sleepData = await SleepDao.getLatest();
-    final studyMinutes = await SettingsDao.getInt('study_duration_minutes', 30);
-    final shortBreakMinutes = await SettingsDao.getInt(
-      'short_break_minutes',
-      5,
-    );
-    final recoveryGuide = guides.isEmpty
-        ? const RecoveryGuide(
-            id: 'eye_exercise',
-            tag: 'Giãn cơ',
-            title: '5 bài tập thư giãn mắt đơn giản',
-            readTime: '2 phút đọc',
-            thumbnail: AssetImage('assets/focus_rest/relaxation-thumb.png'),
-          )
-        : RecoveryGuide(
-            id: guides.first.id,
-            tag: guides.first.category.name == 'relax' ? 'Giãn cơ' : 'Học tập',
-            title: guides.first.title,
-            readTime: guides.first.readTimeLabel,
-            thumbnail: guides.first.image,
-          );
+    final List <RecoveryGuide> recoveryGuide = guides.isEmpty
+        ? []
+        : guides.where((e)=> e.category.name == 'relax').map(
+            (e) => RecoveryGuide(
+              id: e.id,
+              tag: "Thư giãn",
+              title: e.title,
+              readTime: e.readTimeLabel,
+              thumbnail: e.image,
+            ),
+          ).toList();
 
     if (!mounted) return;
     setState(() {
@@ -97,23 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         FocusRestScreen(
-          subtitle: startedTask == null
-              ? 'Học tập hiệu quả, nghỉ ngơi đúng cách!'
-              : 'Đang học: ${startedTask.title}',
-          timeText: '${studyMinutes.toString().padLeft(2, '0')}:00',
-          timerLabel: 'Thời gian học tập',
-          timerProgress: 0.25,
-          isPlaying: false,
-          onPlayPause: () {},
-          studyDurationText: '$studyMinutes phút',
-          restDurationText: '$shortBreakMinutes phút',
-          progressTitle: 'Tiến trình hôm nay',
-          progressCountLabel: '$completedLessons/$totalLessons',
-          progressTimeDetail: '$studyMinutes phút tập trung',
-          overallProgress: totalLessons == 0
-              ? 0
-              : completedLessons / totalLessons,
-          guides: [recoveryGuide],
+          taskId: widget.startedTaskId,
+          onOpenPlanner: () {
+            setState(() => _currentIndex = 1);
+            _plannerCubit.loadLessons();
+          },
+          guides: recoveryGuide,
         ),
         SleepScreen(data: sleepData, guides: guides),
         const AnalyticsScreen(),
@@ -123,22 +115,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          backgroundColor: AppStyle.pageBackground(context),
-          extendBody: true,
-          body: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _screens[_currentIndex],
-          bottomNavigationBar: _isLoading
-              ? null
-              : _buildScreenWithBottomNav(context),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      BlocListener<FocusRestCubit, FocusRestState>(
+        listenWhen: (previous, current) =>
+            previous.status != FocusRestStatus.completed &&
+            current.status == FocusRestStatus.completed,
+        listener: (context, state) => _plannerCubit.loadLessons(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Scaffold(
+              backgroundColor: AppStyle.pageBackground(context),
+              extendBody: true,
+              body: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _screens[_currentIndex],
+              bottomNavigationBar: _isLoading
+                  ? null
+                  : _buildScreenWithBottomNav(context),
+            );
+          },
+        ),
+      );
 
   Widget _buildScreenWithBottomNav(BuildContext context) {
     List<IconData> iconList = [
@@ -154,6 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _currentIndex = index;
         });
+        if (index == 1) {
+          _plannerCubit.loadLessons();
+        } else if (index == 2 &&
+            _focusCubit.state.status == FocusRestStatus.idle) {
+          _focusCubit.loadTaskSession(null);
+        }
       },
       leftCornerRadius: 32,
       rightCornerRadius: 32,
@@ -179,5 +182,13 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppStyle.navUnselected(context),
             ),
     );
+  }
+
+  void _showStartRejectedMessage() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(content: Text('Khung giờ của nhiệm vụ đã kết thúc.')),
+      );
   }
 }

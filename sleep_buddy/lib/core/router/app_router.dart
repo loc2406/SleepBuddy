@@ -16,9 +16,12 @@ final appRouter = GoRouter(
         final startedTaskId = int.tryParse(
           state.uri.queryParameters['taskId'] ?? '',
         );
+        final startRejected =
+            state.uri.queryParameters['startRejected'] == 'true';
         return HomeScreen(
           initialTab: initialTab ?? 0,
           startedTaskId: startedTaskId,
+          startRejected: startRejected,
         );
       },
     ),

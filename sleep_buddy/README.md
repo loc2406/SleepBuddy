@@ -37,16 +37,16 @@ lib/
     utils/          Tiện ích dùng chung
     widgets/        Widget dùng chung
   features/
-    analytics/presentation/
+    analytics/
       cubit/ model/ models/ screens/ widgets/
-    focus_rest/presentation/
-      screens/ widgets/
+    focus_rest/
+      cubit/ screens/ widgets/
     overview/
       cubit/ screens/ widgets/
-    study_plan/presentation/
+    study_plan/
       cubit/ model/ screens/ widgets/
-    wellness/presentation/
-      cubit/ screens/ widgets/
+    wellness/
+      screens/
     home_screen.dart
 test/
 ```
@@ -67,9 +67,10 @@ Một số thư mục `data/` và `domain/` còn lại trong feature chưa có l
 Mẫu chính:
 
 - Tổng quan: [`lib/features/overview/screens/overview_screen.dart`](lib/features/overview/screens/overview_screen.dart), [`lib/features/overview/cubit/overview_cubit.dart`](lib/features/overview/cubit/overview_cubit.dart), [`lib/features/overview/cubit/overview_state.dart`](lib/features/overview/cubit/overview_state.dart).
-- Lịch học: [`lib/features/study_plan/presentation/screens/study_planner_screen.dart`](lib/features/study_plan/presentation/screens/study_planner_screen.dart), [`lib/features/study_plan/presentation/cubit/study_planner_cubit.dart`](lib/features/study_plan/presentation/cubit/study_planner_cubit.dart), [`lib/features/study_plan/presentation/cubit/study_planner_state.dart`](lib/features/study_plan/presentation/cubit/study_planner_state.dart).
-- Tạo nhiệm vụ: [`lib/features/study_plan/presentation/screens/add_study_task_screen.dart`](lib/features/study_plan/presentation/screens/add_study_task_screen.dart) và [`lib/features/study_plan/presentation/cubit/add_new_study_plan_cubit.dart`](lib/features/study_plan/presentation/cubit/add_new_study_plan_cubit.dart).
-- Cài đặt: [`lib/features/analytics/presentation/screens/settings_screen.dart`](lib/features/analytics/presentation/screens/settings_screen.dart) và [`lib/features/analytics/presentation/cubit/settting_cubit.dart`](lib/features/analytics/presentation/cubit/settting_cubit.dart). Tên `settting_cubit.dart` hiện có ba chữ `t`; giữ nguyên đường dẫn khi sửa file này.
+- Lịch học: [`lib/features/study_plan/screens/study_planner_screen.dart`](lib/features/study_plan/screens/study_planner_screen.dart), [`lib/features/study_plan/cubit/study_planner_cubit.dart`](lib/features/study_plan/cubit/study_planner_cubit.dart), [`lib/features/study_plan/cubit/study_planner_state.dart`](lib/features/study_plan/cubit/study_planner_state.dart).
+- Tạo nhiệm vụ: [`lib/features/study_plan/screens/add_study_task_screen.dart`](lib/features/study_plan/screens/add_study_task_screen.dart) và [`lib/features/study_plan/cubit/add_new_study_plan_cubit.dart`](lib/features/study_plan/cubit/add_new_study_plan_cubit.dart).
+- Tập trung/nghỉ ngơi: [`lib/features/focus_rest/screens/focus_rest_screen.dart`](lib/features/focus_rest/screens/focus_rest_screen.dart), [`lib/features/focus_rest/cubit/focus_rest_cubit.dart`](lib/features/focus_rest/cubit/focus_rest_cubit.dart), [`lib/features/focus_rest/cubit/focus_rest_state.dart`](lib/features/focus_rest/cubit/focus_rest_state.dart).
+- Cài đặt: [`lib/features/analytics/screens/settings_screen.dart`](lib/features/analytics/screens/settings_screen.dart) và [`lib/features/analytics/cubit/settting_cubit.dart`](lib/features/analytics/cubit/settting_cubit.dart). Tên `settting_cubit.dart` hiện có ba chữ `t`; giữ nguyên đường dẫn khi sửa file này.
 
 ### Trách nhiệm từng lớp
 
@@ -88,6 +89,7 @@ Mẫu chính:
 ### Nguồn dữ liệu và tiện ích chính
 
 - Nhiệm vụ học: [`lib/core/db/study_task_dao.dart`](lib/core/db/study_task_dao.dart).
+- Phiên học/nghỉ: [`lib/core/db/focus_session_dao.dart`](lib/core/db/focus_session_dao.dart); mỗi lần đổi tab Phiên học/Nghỉ ngơi đóng một đoạn và bắt đầu đoạn tiếp theo trong `focus_sessions`.
 - Số liệu tổng quan: [`lib/core/db/dashboard_dao.dart`](lib/core/db/dashboard_dao.dart).
 - Báo cáo: [`lib/core/db/report_dao.dart`](lib/core/db/report_dao.dart).
 - Giấc ngủ: [`lib/core/db/sleep_dao.dart`](lib/core/db/sleep_dao.dart).
@@ -97,8 +99,8 @@ Mẫu chính:
 
 ## Nguồn demo/hardcode — không dùng làm chuẩn dữ liệu
 
-- [`lib/features/home_screen.dart`](lib/features/home_screen.dart) chủ yếu ghép tab, nhưng hiện truyền một số giá trị thử nghiệm cho màn hình tập trung như `timerProgress: 0.25`, `isPlaying: false` và callback rỗng. Chỉ tham khảo phần định tuyến/tab khi cần; không lấy các giá trị này làm nghiệp vụ thật.
-- [`lib/features/focus_rest/presentation/screens/focus_rest_screen.dart`](lib/features/focus_rest/presentation/screens/focus_rest_screen.dart) nhận nhiều giá trị qua constructor và hiện được cấp một số dữ liệu thử nghiệm từ `HomeScreen`. Không dùng làm mẫu luồng dữ liệu thật hoặc điều khiển phiên học.
+- [`lib/features/home_screen.dart`](lib/features/home_screen.dart) ghép tab và truyền task ID cho màn hình tập trung. Không đặt logic tính giờ hoặc hoàn thành nhiệm vụ tại đây.
+- Màn hình Tập trung/Nghỉ ngơi hiện dùng dữ liệu từ `FocusRestCubit` và `FocusSessionDao`; các mẹo/cẩm nang có thể chứa nội dung trình bày tĩnh nhưng không quyết định nghiệp vụ timer.
 - Route chi tiết cẩm nang trong [`lib/core/router/app_router.dart`](lib/core/router/app_router.dart) đang truyền nội dung bước hướng dẫn cố định. Không coi các nội dung này là dữ liệu cẩm nang production.
 - [`lib/core/db/seed_dao.dart`](lib/core/db/seed_dao.dart) và [`lib/core/db/demo_data_dao.dart`](lib/core/db/demo_data_dao.dart) phục vụ seed/demo. `main.dart` hiện gọi seed khi khởi động; không xây tính năng thật dựa trên giả định rằng dữ liệu seed luôn tồn tại.
 - [`lib/features/analytics/presentation/screens/analytics_screen.dart`](lib/features/analytics/presentation/screens/analytics_screen.dart) đọc báo cáo thật qua `ReportDao`, nhưng tự quản lý tải dữ liệu bằng `StatefulWidget`; dùng nó để hiểu nguồn báo cáo, không dùng làm mẫu Cubit mới.
@@ -114,5 +116,7 @@ Mẫu chính:
 - Với tính năng mới, ưu tiên mẫu data-driven của `overview` hoặc `study_plan`; không suy luận nghiệp vụ từ dữ liệu hardcode/seed.
 - Giữ nguyên quy ước tên trạng thái và luồng cập nhật hiện có; cập nhật DAO, state, screen và các call site liên quan đồng bộ.
 - Tác vụ cần cập nhật mỗi phút dùng `MinuteTickerCubit`; Cubit feature đăng ký subscription và hủy trong `close()`.
-- Hiển thị lỗi rõ ràng theo mẫu state/UI của feature; không âm thầm trả dữ liệu giả khi tải thất bại.
+- `FocusRestCubit` dùng ticker chung để bù thời gian khi ứng dụng quay lại foreground, đồng thời chạy timer 1 giây chỉ khi có task đang tập trung để hiển thị đếm ngược/counters. Hết `scheduled_end`, Cubit đóng đoạn hiện tại, lưu tổng thời gian và chuyển task sang `completed`; notification kết thúc mở lại tab Tập trung và tổng kết.
+- Hiển thị lỗi rõ ràng theo mẫu state/UI của feature; không âm thầm trả dữ liệu giả khi tải thất bại, bám sát style thiết kế của app.
 - Chỉ thêm test cho hành vi mới hoặc lỗi được sửa, và chạy analyzer/test nhỏ nhất bao phủ phần thay đổi.
+- Nếu xuất hiện trường hợp không được đề cập trong task, hãy hỏi lại để tôi quyết định luồng xử lí, không được tự ý quyết định.

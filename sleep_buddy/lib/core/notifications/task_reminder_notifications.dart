@@ -24,7 +24,9 @@ class TaskReminderNotifications {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   Future<void> Function(int taskId)? onStartTask;
+  Future<void> Function(int taskId)? onOpenFocusTask;
   VoidCallback? onOpenPlanner;
+  VoidCallback? onTaskStartRejected;
   bool _initialized = false;
 
   bool get _supportsLocalScheduling =>
@@ -34,11 +36,15 @@ class TaskReminderNotifications {
 
   Future<void> initialize({
     required Future<void> Function(int taskId) onStartTask,
+    required Future<void> Function(int taskId) onOpenFocusTask,
     required VoidCallback onOpenPlanner,
+    required VoidCallback onTaskStartRejected,
   }) async {
     if (_initialized) return;
     this.onStartTask = onStartTask;
+    this.onOpenFocusTask = onOpenFocusTask;
     this.onOpenPlanner = onOpenPlanner;
+    this.onTaskStartRejected = onTaskStartRejected;
     if (!_supportsLocalScheduling) {
       _initialized = true;
       return;
@@ -102,11 +108,18 @@ class TaskReminderNotifications {
     }
 
     final tasks = await StudyTaskDao.getPendingTaskReminders();
+    final inProgressTasks = await StudyTaskDao.getInProgressTaskReminders();
     final now = DateTime.now();
     final futureTasks = tasks
         .where((task) => task.startsAt.isAfter(now))
         .toList();
-    final futureTaskIds = futureTasks.map((task) => task.id).toSet();
+    final futureInProgressTasks = inProgressTasks
+        .where((task) => task.endsAt.isAfter(now))
+        .toList();
+    final futureTaskIds = {
+      ...futureTasks.map((task) => task.id),
+      ...futureInProgressTasks.map((task) => task.id),
+    };
     final pendingNotifications = await _plugin.pendingNotificationRequests();
     for (final notification in pendingNotifications) {
       if (!futureTaskIds.contains(notification.id)) {
@@ -118,6 +131,13 @@ class TaskReminderNotifications {
         id: task.id,
         title: task.title,
         startsAt: task.startsAt,
+      );
+    }
+    for (final task in futureInProgressTasks) {
+      await scheduleTaskEnd(
+        id: task.id,
+        title: task.title,
+        endsAt: task.endsAt,
       );
     }
   }
@@ -163,6 +183,39 @@ class TaskReminderNotifications {
     );
   }
 
+  Future<void> scheduleTaskEnd({
+    required int id,
+    required String title,
+    required DateTime endsAt,
+  }) async {
+    _ensureInitialized();
+    if (!_supportsLocalScheduling || !endsAt.isAfter(DateTime.now())) return;
+    final notificationsEnabled = await SettingsDao.getBool(
+      'notifications_enabled',
+      false,
+    );
+    if (!notificationsEnabled) return;
+
+    await _plugin.zonedSchedule(
+      id,
+      'Nhiệm vụ đã kết thúc',
+      title,
+      tz.TZDateTime.from(endsAt, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _channelId,
+          'Nhắc nhở nhiệm vụ học tập',
+          channelDescription: 'Thông báo khi nhiệm vụ học tập kết thúc',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: 'end:$id',
+    );
+  }
+
   Future<void> cancelTask(int id) async {
     _ensureInitialized();
     if (!_supportsLocalScheduling) return;
@@ -194,18 +247,30 @@ class TaskReminderNotifications {
     if (payload == null) {
       throw const FormatException('Task reminder is missing its task ID.');
     }
-    final taskId = int.tryParse(payload);
+    final isEndNotification = payload.startsWith('end:');
+    final idText = isEndNotification ? payload.substring(4) : payload;
+    final taskId = int.tryParse(idText);
     if (taskId == null) {
-      throw FormatException('Invalid task reminder ID: $payload');
+      throw FormatException('Invalid task reminder ID: $idText');
+    }
+
+    if (isEndNotification) {
+      final openFocusTask = onOpenFocusTask;
+      if (openFocusTask == null) {
+        throw StateError('Task end handler has not been configured.');
+      }
+      await openFocusTask(taskId);
+      return;
     }
 
     if (response.actionId == _startActionId) {
       final started = await StudyTaskDao.startTaskFromReminder(taskId);
-      await cancelTask(taskId);
       if (!started) {
-        onOpenPlanner?.call();
+        await cancelTask(taskId);
+        onTaskStartRejected?.call();
         return;
       }
+      await cancelTask(taskId);
       final startTask = onStartTask;
       if (startTask == null) {
         throw StateError('Task start handler has not been configured.');

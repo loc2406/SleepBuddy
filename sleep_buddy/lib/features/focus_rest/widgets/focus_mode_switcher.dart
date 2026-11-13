@@ -34,7 +34,7 @@ class FocusModeSwitcher extends StatelessWidget {
         Expanded(
           child: _buildTab(
             context: context,
-            title: 'Thư giãn',
+            title: 'Nghỉ ngơi',
             iconPath: 'assets/focus_rest/bed.png',
             active: currentMode == FocusMode.relax,
             onTap: () => onModeChanged?.call(FocusMode.relax),
